@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * Child process watcher.
+ * Collection of routines to watch child process. Register/unregister handlers for child process start/close.
   @module Tools/base/ProcessWatcher
 */
 

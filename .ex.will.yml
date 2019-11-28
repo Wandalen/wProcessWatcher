@@ -2,7 +2,7 @@
 about :
 
   name : 'wProcessWatcher'
-  description : 'Child process watcher'
+  description : 'Collection of routines to watch child process. Register/unregister handlers for child process start/close.'
   version : '0.4.0'
   enabled : 1
   interpreters :
