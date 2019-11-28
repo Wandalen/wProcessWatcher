@@ -57,87 +57,381 @@ function isRunning( pid )
 
 //
 
-function trivial( test )
+function spawn( test )
 {
   let self = this;
   
-  let start = _.process.starter({ deasync : 1 });
+  let start = _.process.starter({ deasync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
+  let onBeginGot,onEndGot;
   
-  let onBegin = ( got ) => 
+  var expectedArguments = 
+  [
+    'cmd',
+    [ '/c', 'node "-v"' ],
+    {
+      'stdio' : 'pipe',
+      'detached' : false,
+      'cwd' : process.cwd(),
+      'windowsHide' : true,
+      'windowsVerbatimArguments' : true
+    }
+  ]
+  
+  let onBegin = ( o ) => 
   { 
-    test.is( got instanceof ChildProcess.ChildProcess )
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onBeginGot = o;
     beginCounter++
   }
-  let onEnd = ( got ) => 
+  let onEnd = ( o ) => 
   { 
-    test.is( got instanceof ChildProcess.ChildProcess )
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onEndGot = o;
     endCounter++
   }
-  
-  let watcher = new _.process.ProcessWatcher();
   
   start( 'node -v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
   
-  watcher.watchMaking({ onBegin, onEnd });
+  var watcher = _.process.watchMaking({ onBegin, onEnd });
   test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._exec ) );
   test.is( _.routineIs( ChildProcess._execFile ) );
   test.is( _.routineIs( ChildProcess._fork ) );
-  start( 'node -v' );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.identical( onBeginGot.process, got.process );
+  test.identical( onEndGot.process, got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
   
-  watcher.unwatchMaking();
+  watcher.unwatch();
   test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._exec ) );
   test.is( !_.routineIs( ChildProcess._execFile ) );
   test.is( !_.routineIs( ChildProcess._fork ) );
-  start( 'node -v' );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.is( onBeginGot.proces !== got.process );
+  test.is( onEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
-  
 }
 
 //
 
-function killZombieProcess( test )
+function spawnSync( test )
 {
   let self = this;
-  let childProcess = null;
   
-  function onBegin( child )
-  {
-    childProcess = child;
+  let start = _.process.starter({ deasync : 0, sync : 1, mode : 'spawn' });
+  let beginCounter = 0;
+  let endCounter = 0;
+  
+  var expectedArguments = 
+  [
+    'node',
+    [ '-v' ],
+    {
+      'stdio' : 'pipe',
+      'detached' : false,
+      'cwd' : process.cwd(),
+      'windowsHide' : true
+    }
+  ]
+  
+  let onBegin = ( o ) => 
+  { 
+    test.identical( o.process, null )
+    test.identical( o.arguments, expectedArguments );
+    onBeginGot = o;
+    beginCounter++
+  }
+  let onEnd = ( o ) => 
+  { 
+    test.identical( o.process, null )
+    test.identical( o.arguments, expectedArguments );
+    onEndGot = o;
+    endCounter++
   }
   
-  let watcher = new _.process.ProcessWatcher();
-  watcher.watchMaking({ onBegin });
+  start( 'node -v' );
+  test.identical( beginCounter, 0 );
+  test.identical( endCounter, 0 );
   
-  _.process.start
-  ({ 
-    execPath : 'node -e "setTimeout( () => {}, 100000000 )"',
-    throwingExitCode : 0 
-  });
+  var watcher = _.process.watchMaking({ onBegin, onEnd });
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
   
-  let ready = _.timeOut( 3000 );
+  var got = start( 'node -v' )
+  test.identical( got.exitCode, 0 );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
   
-  ready.then( () => 
-  {
-    test.is( childProcess instanceof ChildProcess.ChildProcess );
-    test.is( self.isRunning( childProcess.pid ) );
-    childProcess.kill();
-    test.is( !self.isRunning( childProcess.pid ) );
-    return null;
-  })
+  watcher.unwatch();
+  test.is( !_.routineIs( ChildProcess._spawn ) );
+  test.is( !_.routineIs( ChildProcess._execFile ) );
+  test.is( !_.routineIs( ChildProcess._fork ) );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
   
-  return ready;
+  var got = start( 'node -v' )
+  test.identical( got.exitCode, 0 );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
 }
 
-killZombieProcess.timeOut = 5000;
+//
+
+function fork( test )
+{
+  let self = this;
+  
+  let start = _.process.starter({ deasync : 1, mode : 'fork' });
+  let beginCounter = 0;
+  let endCounter = 0;
+  let onBeginGot,onEndGot;
+  
+  var expectedArguments = 
+  [
+    '-v',
+    [],
+    {
+      'silent' : false,
+      'env' : null,
+      'stdio' : 'pipe',
+      'execArgv' : [],
+      'cwd' : process.cwd()
+    }
+  ]
+  
+  let onBegin = ( o ) => 
+  { 
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onBeginGot = o;
+    beginCounter++
+  }
+  let onEnd = ( o ) => 
+  { 
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onEndGot = o;
+    endCounter++
+  }
+  
+  start( '-v' );
+  test.identical( beginCounter, 0 );
+  test.identical( endCounter, 0 );
+  
+  var watcher = _.process.watchMaking({ onBegin, onEnd });
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( '-v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.identical( onBeginGot.process, got.process );
+  test.identical( onEndGot.process, got.process );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+  
+  watcher.unwatch();
+  test.is( !_.routineIs( ChildProcess._spawn ) );
+  test.is( !_.routineIs( ChildProcess._execFile ) );
+  test.is( !_.routineIs( ChildProcess._fork ) );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( '-v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.is( onBeginGot.proces !== got.process );
+  test.is( onEndGot.proces !== got.process );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+}
+
+//
+
+function exec( test )
+{
+  let self = this;
+  
+  let start = _.process.starter({ deasync : 1, mode : 'exec' });
+  let beginCounter = 0;
+  let endCounter = 0;
+  let onBeginGot,onEndGot;
+  
+  var expectedArguments = 
+  [
+    'node "-v"',
+    { 'env' : null, 'cwd' : process.cwd(), 'shell' : true },
+    undefined
+  ]
+  
+  let onBegin = ( o ) => 
+  { 
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onBeginGot = o;
+    beginCounter++
+  }
+  let onEnd = ( o ) => 
+  { 
+    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.identical( o.arguments, expectedArguments );
+    onEndGot = o;
+    endCounter++
+  }
+  
+  start( 'node -v' );
+  test.identical( beginCounter, 0 );
+  test.identical( endCounter, 0 );
+  
+  var watcher = _.process.watchMaking({ onBegin, onEnd });
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.identical( onBeginGot.process, got.process );
+  test.identical( onEndGot.process, got.process );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+  
+  watcher.unwatch();
+  test.is( !_.routineIs( ChildProcess._spawn ) );
+  test.is( !_.routineIs( ChildProcess._execFile ) );
+  test.is( !_.routineIs( ChildProcess._fork ) );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' ).sync();
+  test.identical( got.exitCode, 0 );
+  test.is( onBeginGot.proces !== got.process );
+  test.is( onEndGot.proces !== got.process );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+}
+
+//
+
+function execSync( test )
+{
+  let self = this;
+  
+  let start = _.process.starter({ deasync : 0, sync : 1, mode : 'exec' });
+  let beginCounter = 0;
+  let endCounter = 0;
+  
+  var expectedArguments = 
+  [
+    'node "-v"',
+    { 'env' : null, 'cwd' : process.cwd(), 'shell' : true },
+    undefined
+  ]
+  
+  let onBegin = ( o ) => 
+  { 
+    test.identical( o.process, null );
+    test.identical( o.arguments, expectedArguments );
+    beginCounter++
+  }
+  let onEnd = ( o ) => 
+  { 
+    test.identical( o.process, null );
+    test.is( _.bufferRawIs( o.returned ) );
+    test.identical( o.arguments, expectedArguments );
+    endCounter++
+  }
+  
+  start( 'node -v' );
+  test.identical( beginCounter, 0 );
+  test.identical( endCounter, 0 );
+  
+  var watcher = _.process.watchMaking({ onBegin, onEnd });
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' )
+  test.identical( got.exitCode, 0 );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+  
+  watcher.unwatch();
+  test.is( !_.routineIs( ChildProcess._spawn ) );
+  test.is( !_.routineIs( ChildProcess._execFile ) );
+  test.is( !_.routineIs( ChildProcess._fork ) );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  
+  var got = start( 'node -v' )
+  test.identical( got.exitCode, 0 );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+}
+
+//
+
+// function killZombieProcess( test )
+// {
+//   let self = this;
+//   let childProcess = null;
+  
+//   function onBegin( child )
+//   {
+//     childProcess = child;
+//   }
+  
+//   let watcher = new _.process.ProcessWatcher();
+//   watcher.watchMaking({ onBegin });
+  
+//   _.process.start
+//   ({ 
+//     execPath : 'node -e "setTimeout( () => {}, 100000000 )"',
+//     throwingExitCode : 0 
+//   });
+  
+//   let ready = _.timeOut( 3000 );
+  
+//   ready.then( () => 
+//   {
+//     test.is( childProcess instanceof ChildProcess.ChildProcess );
+//     test.is( self.isRunning( childProcess.pid ) );
+//     childProcess.kill();
+//     test.is( !self.isRunning( childProcess.pid ) );
+//     return null;
+//   })
+  
+//   return ready;
+// }
+
+// killZombieProcess.timeOut = 5000;
 
 // --
 // test
@@ -164,8 +458,12 @@ var Proto =
 
   tests :
   {
-    trivial,
-    killZombieProcess
+    spawn,
+    spawnSync,
+    fork,
+    exec,
+    execSync,
+    // killZombieProcess
   },
 
 }
