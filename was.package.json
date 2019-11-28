@@ -1,0 +1,34 @@
+{
+  "name" : "wprocesswatcher", 
+  "version" : "0.3.200", 
+  "description" : "Child process watcher", 
+  "license" : "MIT", 
+  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
+  "enabled" : 1, 
+  "contributors" : 
+  [
+    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" }, 
+    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }
+  ], 
+  "main" : "proto/dwtools/abase/l4/ProcessWatcher.s", 
+  "files" : [ "proto/dwtools/abase/l4", "proto/dwtools/Tools.s", "out" ], 
+  "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" }, 
+  "repository" : 
+  {
+    "type" : "git", 
+    "url" : "https://github.com/Wandalen/wProcessWatcher.git"
+  }, 
+  "bugs" : 
+  {
+    "url" : "https://github.com/Wandalen/wProcessWatcher/issues"
+  }, 
+  "dependencies" : 
+  {
+    "wTools": "",
+    "wProto": "",
+    "wCopyable": "",
+    "wprocedure": ""
+  }, 
+  "devDependencies" : { "wTesting" : "", "wappbasic": "" }, 
+  "keywords" : [ "wTools", "watch", "child process" ]
+}
