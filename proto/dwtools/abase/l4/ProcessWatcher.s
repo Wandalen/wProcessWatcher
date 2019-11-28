@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * 
+ * Child process watcher.
   @module Tools/base/ProcessWatcher
 */
 
@@ -44,14 +44,16 @@ function init()
 //
 
 /**
- * @summary Watch for child process start/end.
+ * @summary Enable watch for child process start/end.
  * @description
- * Registers provided `onBegin` and `onEnd` handlers and executes them when each child process is created/closed.
- * Each handler will receive single argument - instance of ChildProcess created by one of methods:
- *  - ChildProcess.exec
- *  - ChildProcess.execFile
- *  - ChildProcess.spawn
- *  - ChildProcess.fork
+ * Patches NodeJs ChildProcess module to hook child process creation.
+ * Adds provided `o.onBegin` and `o.onEnd` handlers to internal queue.
+ * `o.onBegin` handler is executed when child process is created.
+ * `o.onEnd` handler is executed when child process is closed.
+ * Each handler will receive single argument - instance of ChildProcess created by one of methods: exec,execFile,spawn,fork.
+ * Handlers are executed in the order of their registration.
+ * Doesn't register handler that already exists in internal queue.
+ * 
  * @param {Object} o Options map.
  * @param {Object} o.onBegin=null Routine to execute when new child process is created.
  * @param {Object} o.onEnd=null Routine to execute when watched child process is closed.
@@ -61,7 +63,6 @@ function init()
  * @function watchMaking
  * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
  */
-
 
 function watchMaking( o )
 { 
@@ -124,6 +125,23 @@ watchMaking.defaults.onBegin = null;
 watchMaking.defaults.onEnd = null;
 
 //
+
+/**
+ * @summary Disable watch for child process start/end.
+ * @description
+ * Restores original methods of NodeJs ChildProcess module.
+ * Removes all registered `o.onBegin` and `o.onEnd` handler(s) if routine was executed without arguments.
+ * Removes specified `o.onBegin` and `o.onEnd` handler if it was provided through option.
+ * Does nothing if specified handler doesn't exist in internal queue.
+ * @param {Object} o Options map.
+ * @param {Object} o.onBegin=null Routine to execute when new child process is created.
+ * @param {Object} o.onEnd=null Routine to execute when watched child process is closed.
+ *
+ * @return {Object} Returns ProcessWatcher instance.
+ *
+ * @function watchMaking
+ * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
+ */
 
 function unwatchMaking( o )
 { 
