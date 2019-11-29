@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wFiles' );
   _.include( 'wAppBasic' );
 
-  require( '../l4/ProcessWatcher.s' );
+  require( '../l5/ProcessWatcher.s' );
   
   var ChildProcess = require( 'child_process' );
 }
@@ -442,7 +442,7 @@ function execSync( test )
 var Proto =
 {
 
-  name : 'Tools.base.l4.ProcessWatcher',
+  name : 'Tools.base.l5.ProcessWatcher',
   silencing : 1,
   routineTimeOut : 60000,
   onSuiteBegin : suiteBegin,
