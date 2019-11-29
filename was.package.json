@@ -1,7 +1,7 @@
 {
   "name" : "wprocesswatcher", 
   "version" : "0.3.200", 
-  "description" : "Child process watcher", 
+  "description" : "Collection of routines to watch child process. Register/unregister handlers for child process start/close.", 
   "license" : "MIT", 
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
   "enabled" : 1, 
@@ -10,8 +10,8 @@
     { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" }, 
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }
   ], 
-  "main" : "proto/dwtools/abase/l4/ProcessWatcher.s", 
-  "files" : [ "proto/dwtools/abase/l4", "proto/dwtools/Tools.s", "out" ], 
+  "main" : "proto/dwtools/abase/l5/ProcessWatcher.s", 
+  "files" : [ "proto/dwtools/abase/l5", "proto/dwtools/Tools.s", "out" ], 
   "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" }, 
   "repository" : 
   {

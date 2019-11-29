@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * Child process watcher.
+ * Collection of routines to watch child process. Register/unregister handlers for child process start/close.
   @module Tools/base/ProcessWatcher
 */
 
@@ -22,24 +22,7 @@ if( typeof module !== 'undefined' )
 let ChildProcess;
 let _global = _global_;
 let _ = _global_.wTools;
-let Parent = null;
-let Self = function wProcessWatcher( o )
-{
-  return _.workpiece.construct( Self, this, arguments );
-}
-
-Self.shortName = 'ProcessWatcher';
-
-//
-
-function init()
-{
-  let self = this;
-
-  _.workpiece.initFields( self );
-  
-  return self;
-}
+let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
 
 //
 
@@ -66,27 +49,37 @@ function init()
 
 function watchMaking( o )
 { 
-  let self = this;
-  
   _.assert( arguments.length === 1 );
   _.routineOptions( watchMaking, arguments );
-  _.assert( _.routineIs( o.onBegin ) || _.routineIs( o.onEnd ), 'Routine expects at least one handler {o.onBegin} or {o.onEnd}' )
+  _.assert( _.routineIs( o.onBegin ) || _.routineIs( o.onEnd ), 'Routine expects both {o.onBegin} and {o.onEnd} handlers.' )
   
   if( !ChildProcess )
   {
     ChildProcess = require( 'child_process' );
+    
+    if( _.process._watcher === null )
+    {
+      _.process._watcher = Object.create( null );
+      _.process._watcher.onBegin = [];
+      _.process._watcher.onEnd = [];
+    }
+    
     patch( 'spawn' );
     patch( 'fork' );
-    patch( 'exec' );
     patch( 'execFile' );
+    patchSync( 'spawnSync' )
+    patchSync( 'execFileSync' )
   }
   
   if( o.onBegin )
-  _.arrayAppendOnce( self.onBegin, o.onBegin )
+  _.arrayAppendOnce( _.process._watcher.onBegin, o.onBegin )
   if( o.onEnd )
-  _.arrayAppendOnce( self.onEnd, o.onEnd )
+  _.arrayAppendOnce( _.process._watcher.onEnd, o.onEnd )
   
-  return self;
+  let result = _.mapExtend( null, o );
+  result.unwatch = _.routineJoin( _.process, unwatchMaking, [{ onBegin : o.onBegin, onEnd : o.onEnd }] );
+  
+  return result;
   
   /*  */
   
@@ -101,21 +94,48 @@ function watchMaking( o )
     
     ChildProcess[ routine ] = function()
     { 
+      
       let childProcess = original.apply( ChildProcess, arguments );
       let procedure = _.procedure.begin({ _name : 'PID:' + childProcess.pid, /* qqq _object : childProcess */ });
-      self.processes.push( childProcess );
-      self.processesById[ childProcess.pid ] = childProcess;
-      _.each( self.onBegin, onBegin => onBegin( childProcess ) );
-      
+      let o = 
+      {
+        arguments : Array.prototype.slice.call( arguments ),
+        process : childProcess
+      }
+      _.each( _.process._watcher.onBegin, onBegin => onBegin( o ) );
       childProcess.on( 'close', () => 
       {  
         procedure.end();
-        _.arrayRemoveElement( self.processes, childProcess );
-        delete self.processesById[ childProcess.pid ];
-        _.each( self.onEnd, onEnd => onEnd( childProcess ) );
+        _.each( _.process._watcher.onEnd, onEnd => onEnd( o ) );
       });
-      
       return childProcess;
+    }
+  }
+  
+  //
+  
+  function patchSync( routine )
+  {
+    let _routine = _.strPrependOnce( routine, '_' );
+    
+    _.assert( _.routineIs( ChildProcess[ routine ] ) );
+    _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
+    
+    let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
+    
+    ChildProcess[ routine ] = function()
+    { 
+      let o = 
+      {
+        arguments : Array.prototype.slice.call( arguments ),
+        process : null
+      }
+      let procedure = _.procedure.begin({});
+      _.each( _.process._watcher.onBegin, onBegin => onBegin( o ) );
+      o.returned = original.apply( ChildProcess, arguments );
+      procedure.end();
+      _.each( _.process._watcher.onEnd, onEnd => onEnd( o ) );
+      return o.returned;
     }
   }
 }
@@ -145,37 +165,42 @@ watchMaking.defaults.onEnd = null;
 
 function unwatchMaking( o )
 { 
-  let self = this;
-  
   if( !o )
   o = Object.create( null );
   
   _.routineOptions( unwatchMaking, arguments );
   
+  if( !_.process._watcher )
+  return false;
+  
+  let onBegin = _.process._watcher.onBegin;
+  let onEnd = _.process._watcher.onEnd;
+  
   if( !o.onBegin && !o.onEnd )
   { 
-    _.arrayEmpty( self.onBegin );
-    _.arrayEmpty( self.onEnd );
+    _.arrayEmpty( onBegin );
+    _.arrayEmpty( onEnd );
   }
   else
   {
     if( o.onBegin )
-    _.arrayRemoveElement( self.onBegin,o.onBegin );
+    _.arrayRemoveElement( onBegin,o.onBegin );
     if( o.onEnd )
-    _.arrayRemoveElement( self.onEnd,o.onEnd );
+    _.arrayRemoveElement( onEnd,o.onEnd );
   }
   
   if( ChildProcess )
-  if( !self.onBegin.length && !self.onEnd.length )
+  if( !onBegin.length && !onEnd.length )
   {
     unpatch( 'spawn' );
     unpatch( 'fork' );
-    unpatch( 'exec' );
     unpatch( 'execFile' );
+    unpatch( 'spawnSync' )
+    unpatch( 'execFileSync' )
     ChildProcess = null;
   }
   
-  return self;
+  return true;
   
   /*  */
   
@@ -194,39 +219,47 @@ unwatchMaking.defaults.onEnd = null;
 
 //
 
+function watcherIsAlive( watcher )
+{
+  _.assert( arguments.length === 1 )
+  _.assert( _.objectIs( watcher ) );
+  _.assert( _.routineIs( watcher.onBegin ) );
+  _.assert( _.routineIs( watcher.onEnd ) );
+  _.assert( _.routineIs( watcher.unwatch ) );
+  
+  if( !_.process._watcher )
+  return false;
+  
+  _.assert( _.arrayIs( _.process._watcher.onBegin ) );
+  _.assert( _.arrayIs( _.process._watcher.onEnd ) );
+  
+  if( _.arrayHas( _.process._watcher.onBegin, watcher.onBegin ) )
+  if( _.arrayHas( _.process._watcher.onEnd, watcher.onEnd ) )
+  return true;
+  
+  return false;
+}
+
+//
+
 // --
 // declare
 // --
 
-let Restricts = 
+let Fields =
 {
-  onBegin : _.define.own( [] ),
-  onEnd : _.define.own( [] ),
-  processes : _.define.own( [] ),
-  processesById : _.define.own( {} )
+  _watcher : null,
 }
 
-let Extend =
+let Routines =
 { 
-  init, 
-  
   watchMaking,
   unwatchMaking,
-  
-  Restricts
+  watcherIsAlive,
 }
 
-_.classDeclare
-({
-  cls : Self,
-  parent : Parent,
-  extend : Extend,
-});
-
-_.Copyable.mixin( Self );
-
-_.process = _.process || Object.create( null );
-_.process[ Self.shortName ] = Self;
+_.mapExtend( Self, Fields );
+_.mapExtend( Self, Routines );
 
 // --
 // export
