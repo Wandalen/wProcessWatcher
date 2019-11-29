@@ -1,23 +1,33 @@
-var _ = require( '../proto/dwtools/abase/l5/ProcessWatcher.s' )
-require( 'wappbasic' )
-require( 'wFiles' )
+var _ = require( '..' )
+_.include( 'wAppBasic' )
+_.include( 'wFiles' )
 
-let watcher = new _.process.ProcessWatcher();
-
-function onBegin( r )
+function onBegin( o )
 {
-  console.log( 'begin' );
+  console.log( '\n=Begin=' );
+  console.log( 'arguments:', o.arguments );
+  console.log( 'process pid:', o.process.pid );
 }
 
-function onEnd( r )
+function onEnd( o )
 {
-  console.log( 'end' );
+  console.log( '\n=End=' );
+  console.log( 'arguments:', o.arguments );
+  console.log( 'process pid:', o.process.pid );
 }
 
-watcher.watchMaking({ onBegin, onEnd })
+var watcher = _.process.watchMaking({ onBegin, onEnd })
 
-_.process.start({ execPath : 'node -v', mode : 'spawn', deasync : 1 });
+_.process.start
+({ 
+  execPath : 'node -v', 
+  deasync : 1 
+});
 
-watcher.unwatchMaking()
+watcher.unwatch();
 
-_.process.start({ execPath : 'node -v', mode : 'spawn', deasync : 1 });
+_.process.start
+({ 
+  execPath : 'node -v', 
+  deasync : 1 
+});
