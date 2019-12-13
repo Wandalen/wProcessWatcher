@@ -1,6 +1,6 @@
 {
   "name" : "wprocesswatcher", 
-  "version" : "0.3.200", 
+  "version" : "0.3.201", 
   "description" : "Collection of routines to watch child process. Register/unregister handlers for child process start/close.", 
   "license" : "MIT", 
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
@@ -24,11 +24,11 @@
   }, 
   "dependencies" : 
   {
-    "wTools": "",
-    "wProto": "",
-    "wCopyable": "",
-    "wprocedure": ""
+    "wTools" : "", 
+    "wProto" : "", 
+    "wCopyable" : "", 
+    "wprocedure" : ""
   }, 
-  "devDependencies" : { "wTesting" : "", "wappbasic": "" }, 
+  "devDependencies" : { "wTesting" : "", "wappbasic" : "" }, 
   "keywords" : [ "wTools", "watch", "child process" ]
 }
