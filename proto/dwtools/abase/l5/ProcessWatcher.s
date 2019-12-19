@@ -47,6 +47,8 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
  */
 
+let watcherEnabledTimes = 0;
+
 function watcherEnable()
 { 
   _.assert( arguments.length === 0 );
@@ -70,7 +72,16 @@ function watcherEnable()
     patchSync( 'execFileSync' )
     
     _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
+    
+    _.process.on( 'exit', () => 
+    {
+      if( _.process.watcherIsEnabled() )
+      throw _.err( 'ProcessWatcher was not disabled.' )
+    })
+    
   }
+  
+  watcherEnabledTimes += 1;
   
   return true;
   
@@ -140,7 +151,7 @@ function watcherEnable()
   }
   
   function _eventHandle( event, o )
-  {
+  { 
     if( !_.process._eventCallbackMap[ event ].length )
     return;
 
@@ -180,7 +191,15 @@ function watcherEnable()
  */
 
 function watcherDisable()
-{ 
+{  
+  if( !watcherEnabledTimes )
+  return;
+  
+  watcherEnabledTimes -= 1;
+  
+  if( watcherEnabledTimes )
+  return;
+    
   _.each( _eventCallbackMap, ( handlers, event ) => 
   { 
     if( !_.process._eventCallbackMap[ event ] )
