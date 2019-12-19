@@ -433,6 +433,36 @@ function execSync( test )
 
 // killZombieProcess.timeOut = 5000;
 
+//
+
+function patchHomeDir( test )
+{
+  let self = this;
+  
+  let start = _.process.starter({ mode : 'spawn', outputCollecting : 1 });
+  let homedirPath = _.path.nativize( '/D/tmp.tmp' );
+  
+  let onPatch = ( o ) => 
+  {  
+    o.arguments[ 2 ].env = Object.create( null );
+    if( process.platform == 'win32' )
+    o.arguments[ 2 ].env[ 'USERPROFILE' ] = homedirPath
+    else
+    o.arguments[ 2 ].env[ 'HOME' ] = homedirPath
+  }
+  
+  var watcher = _.process.watchMaking({ onPatch });
+  
+  return start( `node -e "console.log( require('os').homedir() )"` )
+  .then( ( got ) => 
+  {
+    test.identical( got.exitCode, 0 );
+    test.is( _.strHas( got.output, homedirPath ) );
+    watcher.unwatch();
+    return null;
+  })
+}
+
 // --
 // test
 // --
@@ -463,6 +493,7 @@ var Proto =
     fork,
     exec,
     execSync,
+    patchHomeDir
     // killZombieProcess
   },
 
