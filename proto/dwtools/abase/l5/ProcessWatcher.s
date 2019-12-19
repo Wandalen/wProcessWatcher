@@ -22,7 +22,7 @@ if( typeof module !== 'undefined' )
 let ChildProcess;
 let _global = _global_;
 let _ = _global_.wTools;
-let Self = _.process = _.process || Object.create( null );
+let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
 
 //
 

@@ -15,9 +15,9 @@
       "email": "volodymyr.migdal@gmail.com"
     }
   ],
-  "main": "proto/dwtools/abase/l4/ProcessWatcher.s",
+  "main": "proto/dwtools/abase/l5/ProcessWatcher.s",
   "files": [
-    "proto/dwtools/abase/l4",
+    "proto/dwtools/abase/l5",
     "proto/dwtools/Tools.s",
     "out"
   ],
