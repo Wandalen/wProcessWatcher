@@ -12,8 +12,9 @@ if( typeof module !== 'undefined' )
   _.include( 'wAppBasic' );
 
   require( '../l5/ProcessWatcher.s' );
-  
+
   var ChildProcess = require( 'child_process' );
+
 }
 
 
@@ -60,7 +61,7 @@ function isRunning( pid )
 function spawn( test )
 {
   let self = this;
-  
+
   let start = _.process.starter({ deasync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
@@ -92,7 +93,7 @@ function spawn( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( 'node -v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -124,7 +125,7 @@ function spawn( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
   test.is( subprocessStartEndGot.proces !== got.process );
@@ -138,7 +139,7 @@ function spawn( test )
 function spawnSync( test )
 {
   let self = this;
-  
+
   let start = _.process.starter({ deasync : 0, sync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
@@ -170,7 +171,7 @@ function spawnSync( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( 'node -v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -200,7 +201,7 @@ function spawnSync( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node -v' )
   test.identical( got.exitCode, 0 );
   test.identical( beginCounter, 1 );
@@ -212,7 +213,7 @@ function spawnSync( test )
 function fork( test )
 {
   let self = this;
-  
+
   let start = _.process.starter({ deasync : 1, mode : 'fork' });
   let beginCounter = 0;
   let endCounter = 0;
@@ -245,7 +246,7 @@ function fork( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( '-v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -277,7 +278,7 @@ function fork( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
   test.is( subprocessStartEndGot.proces !== got.process );
@@ -291,7 +292,7 @@ function fork( test )
 function exec( test )
 {
   let self = this;
-  
+
   let start = _.process.starter({ deasync : 1, mode : 'exec' });
   let beginCounter = 0;
   let endCounter = 0;
@@ -318,7 +319,7 @@ function exec( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( 'node -v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -350,7 +351,7 @@ function exec( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
   test.is( subprocessStartEndGot.proces !== got.process );
@@ -364,17 +365,17 @@ function exec( test )
 function execFile( test )
 {
   let self = this;
-  
+
   let start = function execFile( exec, args )
   {
     let ready = new _.Consequence();
     var childProcess = ChildProcess.execFile( exec, args );
     var result = { process : childProcess };
-    childProcess.on( 'close', ( exitCode, exitSignal ) => 
-    { 
+    childProcess.on( 'close', ( exitCode, exitSignal ) =>
+    {
       result.exitCode = exitCode;
       result.exitSignal = exitSignal;
-      ready.take( result ) 
+      ready.take( result )
     })
     childProcess.on( 'error', ( err ) => ready.error( err ) )
     ready.deasyncWait();
@@ -386,7 +387,7 @@ function execFile( test )
   
   var expectedArguments = 
   [
-    'node', 
+    'node',
     [ '-v' ]
   ]
   
@@ -404,7 +405,7 @@ function execFile( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( 'node', [ '-v' ] );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -436,14 +437,14 @@ function execFile( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
   test.is( subprocessStartEndGot.proces !== got.process );
   test.is( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
-  
+
 }
 
 //
@@ -451,12 +452,12 @@ function execFile( test )
 function execSync( test )
 {
   let self = this;
-  
+
   let start = _.process.starter({ deasync : 0, sync : 1, mode : 'exec' });
   let beginCounter = 0;
   let endCounter = 0;
-  
-  var expectedArguments = 
+
+  var expectedArguments =
   [
     'node "-v"',
     { 'env' : null, 'cwd' : process.cwd(), 'shell' : true },
@@ -476,7 +477,7 @@ function execSync( test )
     test.identical( o.arguments, expectedArguments );
     endCounter++
   }
-  
+
   start( 'node -v' );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -506,7 +507,7 @@ function execSync( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node -v' )
   test.identical( got.exitCode, 0 );
   test.identical( beginCounter, 1 );
@@ -518,16 +519,16 @@ function execSync( test )
 function execFileSync( test )
 {
   let self = this;
-  
+
   let start = function execFileSync( exec, args )
   {
     var result = Object.create( null );
-    try 
+    try
     {
       result.process = ChildProcess.execFileSync( exec, args );
       result.exitCode = 0;
-    } 
-    catch ( err ) 
+    }
+    catch ( err )
     {
       result.process = err;
       result.exitCode = result.process.status;
@@ -540,7 +541,7 @@ function execFileSync( test )
   
   var expectedArguments = 
   [
-    'node', 
+    'node',
     [ '-v' ]
   ]
   
@@ -559,7 +560,7 @@ function execFileSync( test )
     subprocessTerminationEndGot = o;
     endCounter++
   }
-  
+
   start( 'node', [ '-v' ] );
   test.identical( beginCounter, 0 );
   test.identical( endCounter, 0 );
@@ -592,7 +593,7 @@ function execFileSync( test )
   test.is( !_.routineIs( ChildProcess._spawnSync ) );
   test.is( !_.routineIs( ChildProcess._execSync ) );
   test.is( !_.routineIs( ChildProcess._execFileSync ) );
-  
+
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
   test.is( subprocessStartEndGot.proces !== got.process );
@@ -661,8 +662,6 @@ function patchHomeDir( test )
 // --
 // test
 // --
-
-//
 
 var Proto =
 {

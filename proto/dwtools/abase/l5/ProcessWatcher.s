@@ -36,7 +36,7 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  * Each handler will receive single argument - instance of ChildProcess created by one of methods: exec,execFile,spawn,fork.
  * Handlers are executed in the order of their registration.
  * Doesn't register handler that already exists in internal queue.
- * 
+ *
  * @param {Object} o Options map.
  * @param {Object} o.onBegin=null Routine to execute when new child process is created.
  * @param {Object} o.onEnd=null Routine to execute when watched child process is closed.
@@ -54,7 +54,7 @@ function watcherEnable()
   if( !ChildProcess )
   {
     ChildProcess = require( 'child_process' );
-    
+
     if( _.process._watcher === null )
     {
       _.process._watcher = Object.create( null );
@@ -62,7 +62,7 @@ function watcherEnable()
       _.process._watcher.onEnd = [];
       _.process._watcher.onPatch = [];
     }
-    
+
     patch( 'spawn' );
     patch( 'fork' );
     patch( 'execFile' );
@@ -75,16 +75,16 @@ function watcherEnable()
   return true;
   
   /*  */
-  
+
   function patch( routine )
-  { 
+  {
     let _routine = _.strPrependOnce( routine, '_' );
-    
+
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
     _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
-    
+
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-    
+
     ChildProcess[ routine ] = function()
     { 
       var o = 
@@ -110,18 +110,18 @@ function watcherEnable()
       return o.process;
     }
   }
-  
+
   //
-  
+
   function patchSync( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
-    
+
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
     _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
-    
+
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-    
+
     ChildProcess[ routine ] = function()
     { 
       var o = 
@@ -199,11 +199,11 @@ function watcherDisable()
     unpatch( 'execFileSync' )
     ChildProcess = null;
   }
-  
+
   return true;
-  
+
   /*  */
-  
+
   function unpatch( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
@@ -222,8 +222,6 @@ function watcherIsEnabled()
   return true;
   return false;
 }
-
-//
 
 // --
 // declare
