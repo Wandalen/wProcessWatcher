@@ -36,7 +36,7 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  * Each handler will receive single argument - instance of ChildProcess created by one of methods: exec,execFile,spawn,fork.
  * Handlers are executed in the order of their registration.
  * Doesn't register handler that already exists in internal queue.
- * 
+ *
  * @param {Object} o Options map.
  * @param {Object} o.onBegin=null Routine to execute when new child process is created.
  * @param {Object} o.onEnd=null Routine to execute when watched child process is closed.
@@ -48,84 +48,84 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  */
 
 function watchMaking( o )
-{ 
+{
   _.assert( arguments.length === 1 );
   _.routineOptions( watchMaking, arguments );
   _.assert( _.routineIs( o.onBegin ) || _.routineIs( o.onEnd ), 'Routine expects both {o.onBegin} and {o.onEnd} handlers.' )
-  
+
   if( !ChildProcess )
   {
     ChildProcess = require( 'child_process' );
-    
+
     if( _.process._watcher === null )
     {
       _.process._watcher = Object.create( null );
       _.process._watcher.onBegin = [];
       _.process._watcher.onEnd = [];
     }
-    
+
     patch( 'spawn' );
     patch( 'fork' );
     patch( 'execFile' );
     patchSync( 'spawnSync' )
     patchSync( 'execFileSync' )
   }
-  
+
   if( o.onBegin )
   _.arrayAppendOnce( _.process._watcher.onBegin, o.onBegin )
   if( o.onEnd )
   _.arrayAppendOnce( _.process._watcher.onEnd, o.onEnd )
-  
+
   let result = _.mapExtend( null, o );
   result.unwatch = _.routineJoin( _.process, unwatchMaking, [{ onBegin : o.onBegin, onEnd : o.onEnd }] );
-  
+
   return result;
-  
+
   /*  */
-  
+
   function patch( routine )
-  { 
+  {
     let _routine = _.strPrependOnce( routine, '_' );
-    
+
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
     _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
-    
+
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-    
+
     ChildProcess[ routine ] = function()
-    { 
-      
+    {
+
       let childProcess = original.apply( ChildProcess, arguments );
       let procedure = _.procedure.begin({ _name : 'PID:' + childProcess.pid, /* qqq _object : childProcess */ });
-      let o = 
+      let o =
       {
         arguments : Array.prototype.slice.call( arguments ),
         process : childProcess
       }
       _.each( _.process._watcher.onBegin, onBegin => onBegin( o ) );
-      childProcess.on( 'close', () => 
-      {  
+      childProcess.on( 'close', () =>
+      {
         procedure.end();
         _.each( _.process._watcher.onEnd, onEnd => onEnd( o ) );
       });
       return childProcess;
     }
   }
-  
+
   //
-  
+
   function patchSync( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
-    
+
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
     _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
-    
+
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-    
+
     ChildProcess[ routine ] = function()
-    { 
-      let o = 
+    {
+      let o =
       {
         arguments : Array.prototype.slice.call( arguments ),
         process : null
@@ -164,20 +164,20 @@ watchMaking.defaults.onEnd = null;
  */
 
 function unwatchMaking( o )
-{ 
+{
   if( !o )
   o = Object.create( null );
-  
+
   _.routineOptions( unwatchMaking, arguments );
-  
+
   if( !_.process._watcher )
   return false;
-  
+
   let onBegin = _.process._watcher.onBegin;
   let onEnd = _.process._watcher.onEnd;
-  
+
   if( !o.onBegin && !o.onEnd )
-  { 
+  {
     _.arrayEmpty( onBegin );
     _.arrayEmpty( onEnd );
   }
@@ -188,7 +188,7 @@ function unwatchMaking( o )
     if( o.onEnd )
     _.arrayRemoveElement( onEnd,o.onEnd );
   }
-  
+
   if( ChildProcess )
   if( !onBegin.length && !onEnd.length )
   {
@@ -199,11 +199,11 @@ function unwatchMaking( o )
     unpatch( 'execFileSync' )
     ChildProcess = null;
   }
-  
+
   return true;
-  
+
   /*  */
-  
+
   function unpatch( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
@@ -226,21 +226,19 @@ function watcherIsAlive( watcher )
   _.assert( _.routineIs( watcher.onBegin ) );
   _.assert( _.routineIs( watcher.onEnd ) );
   _.assert( _.routineIs( watcher.unwatch ) );
-  
+
   if( !_.process._watcher )
   return false;
-  
+
   _.assert( _.arrayIs( _.process._watcher.onBegin ) );
   _.assert( _.arrayIs( _.process._watcher.onEnd ) );
-  
+
   if( _.arrayHas( _.process._watcher.onBegin, watcher.onBegin ) )
   if( _.arrayHas( _.process._watcher.onEnd, watcher.onEnd ) )
   return true;
-  
+
   return false;
 }
-
-//
 
 // --
 // declare
@@ -252,7 +250,7 @@ let Fields =
 }
 
 let Routines =
-{ 
+{
   watchMaking,
   unwatchMaking,
   watcherIsAlive,
