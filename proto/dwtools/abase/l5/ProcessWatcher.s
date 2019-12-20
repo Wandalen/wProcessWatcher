@@ -5,7 +5,7 @@
 /**
  * Collection of routines to watch child process. Register/unregister handlers for child process start/close.
   @module Tools/base/ProcessWatcher
-*/
+ */
 
 /**
  * @file ProcessWatcher.s.
@@ -19,9 +19,17 @@ if( typeof module !== 'undefined' )
   _.include( 'wProcedure' )
 }
 
-let ChildProcess;
 let _global = _global_;
 let _ = _global_.wTools;
+
+if( _realGlobal_ !== _global_ )
+if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process.watcherEnable )
+return ExportTo( _global_, _realGlobal_ );
+
+_.assert( !!_global_.wTools, 'Does not have wTools' );
+_.assert( _global_.wTools.process === undefined || _global_.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
+
+let ChildProcess;
 let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
 
 //
@@ -43,44 +51,36 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  *
  * @return {Object} Returns ProcessWatcher instance.
  *
- * @function watchMaking
+ * @function watcherEnable
  * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
  */
 
-function watchMaking( o )
-{
-  _.assert( arguments.length === 1 );
-  _.routineOptions( watchMaking, arguments );
-  _.assert( _.routineIs( o.onBegin ) || _.routineIs( o.onEnd ), 'Routine expects both {o.onBegin} and {o.onEnd} handlers.' )
-
+function watcherEnable()
+{ 
+  _.assert( arguments.length === 0 );
+  
   if( !ChildProcess )
   {
     ChildProcess = require( 'child_process' );
-
-    if( _.process._watcher === null )
-    {
-      _.process._watcher = Object.create( null );
-      _.process._watcher.onBegin = [];
-      _.process._watcher.onEnd = [];
-    }
 
     patch( 'spawn' );
     patch( 'fork' );
     patch( 'execFile' );
     patchSync( 'spawnSync' )
     patchSync( 'execFileSync' )
+    
+    _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
+    
+    _.process.on( 'exit', () => 
+    { 
+      if( _.process.watcherIsEnabled() )
+      _.process.watcherDisable(); 
+    })
+    
   }
-
-  if( o.onBegin )
-  _.arrayAppendOnce( _.process._watcher.onBegin, o.onBegin )
-  if( o.onEnd )
-  _.arrayAppendOnce( _.process._watcher.onEnd, o.onEnd )
-
-  let result = _.mapExtend( null, o );
-  result.unwatch = _.routineJoin( _.process, unwatchMaking, [{ onBegin : o.onBegin, onEnd : o.onEnd }] );
-
-  return result;
-
+  
+  return true;
+  
   /*  */
 
   function patch( routine )
@@ -93,22 +93,32 @@ function watchMaking( o )
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
     ChildProcess[ routine ] = function()
-    {
-
-      let childProcess = original.apply( ChildProcess, arguments );
-      let procedure = _.procedure.begin({ _name : 'PID:' + childProcess.pid, /* qqq _object : childProcess */ });
-      let o =
+    { 
+      var o = 
       {
         arguments : Array.prototype.slice.call( arguments ),
-        process : childProcess
+        process : null,
+        sync : 0
       }
-      _.each( _.process._watcher.onBegin, onBegin => onBegin( o ) );
-      childProcess.on( 'close', () =>
-      {
+      
+      _eventHandle( 'subprocessStartBegin', o )
+      
+      o.process = original.apply( ChildProcess, arguments );
+      
+      if( !_.numberIs( o.process.pid ) )
+      return o.process;
+      
+      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ });
+      
+      _eventHandle( 'subprocessStartEnd', o )
+      
+      o.process.on( 'close', () => 
+      {  
         procedure.end();
-        _.each( _.process._watcher.onEnd, onEnd => onEnd( o ) );
+        _eventHandle( 'subprocessTerminationEnd', o );
       });
-      return childProcess;
+      
+      return o.process;
     }
   }
 
@@ -124,25 +134,43 @@ function watchMaking( o )
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
     ChildProcess[ routine ] = function()
-    {
-      let o =
+    { 
+      var o = 
       {
         arguments : Array.prototype.slice.call( arguments ),
-        process : null
+        process : null,
+        sync : 1
       }
       let procedure = _.procedure.begin({});
-      _.each( _.process._watcher.onBegin, onBegin => onBegin( o ) );
+      _eventHandle( 'subprocessStartBegin', o )
+      _eventHandle( 'subprocessStartEnd', o )
       o.returned = original.apply( ChildProcess, arguments );
       procedure.end();
-      _.each( _.process._watcher.onEnd, onEnd => onEnd( o ) );
+      _eventHandle( 'subprocessTerminationEnd', o );
       return o.returned;
     }
   }
-}
+  
+  function _eventHandle( event, o )
+  { 
+    if( !_.process._eventCallbackMap[ event ].length )
+    return;
 
-watchMaking.defaults = Object.create( null );
-watchMaking.defaults.onBegin = null;
-watchMaking.defaults.onEnd = null;
+    let callbacks = _.process._eventCallbackMap[ event ].slice();
+    callbacks.forEach( ( callback ) =>
+    {
+      try
+      {
+        callback.call( _.process, o );
+      }
+      catch( err )
+      {
+        throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
+      }
+    });
+
+  }
+}
 
 //
 
@@ -159,38 +187,22 @@ watchMaking.defaults.onEnd = null;
  *
  * @return {Object} Returns ProcessWatcher instance.
  *
- * @function watchMaking
+ * @function watcherEnable
  * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
  */
 
-function unwatchMaking( o )
-{
-  if( !o )
-  o = Object.create( null );
-
-  _.routineOptions( unwatchMaking, arguments );
-
-  if( !_.process._watcher )
-  return false;
-
-  let onBegin = _.process._watcher.onBegin;
-  let onEnd = _.process._watcher.onEnd;
-
-  if( !o.onBegin && !o.onEnd )
-  {
-    _.arrayEmpty( onBegin );
-    _.arrayEmpty( onEnd );
-  }
-  else
-  {
-    if( o.onBegin )
-    _.arrayRemoveElement( onBegin,o.onBegin );
-    if( o.onEnd )
-    _.arrayRemoveElement( onEnd,o.onEnd );
-  }
-
+function watcherDisable()
+{  
+  _.each( _eventCallbackMap, ( handlers, event ) => 
+  { 
+    if( !_.process._eventCallbackMap[ event ] )
+    return;
+    if( _.process._eventCallbackMap, handlers.length )
+    throw _.err( 'Event', event, 'has', handlers.length,  'registered handlers.\nPlease use _.process.off to unregister handlers.' );
+    delete Self._eventCallbackMap[ event ];
+  })
+  
   if( ChildProcess )
-  if( !onBegin.length && !onEnd.length )
   {
     unpatch( 'spawn' );
     unpatch( 'fork' );
@@ -213,57 +225,57 @@ function unwatchMaking( o )
   }
 }
 
-unwatchMaking.defaults = Object.create( null );
-unwatchMaking.defaults.onBegin = null;
-unwatchMaking.defaults.onEnd = null;
-
 //
 
-function watcherIsAlive( watcher )
-{
-  _.assert( arguments.length === 1 )
-  _.assert( _.objectIs( watcher ) );
-  _.assert( _.routineIs( watcher.onBegin ) );
-  _.assert( _.routineIs( watcher.onEnd ) );
-  _.assert( _.routineIs( watcher.unwatch ) );
-
-  if( !_.process._watcher )
-  return false;
-
-  _.assert( _.arrayIs( _.process._watcher.onBegin ) );
-  _.assert( _.arrayIs( _.process._watcher.onEnd ) );
-
-  if( _.arrayHas( _.process._watcher.onBegin, watcher.onBegin ) )
-  if( _.arrayHas( _.process._watcher.onEnd, watcher.onEnd ) )
+function watcherIsEnabled()
+{ 
+  for( var event in _eventCallbackMap )
+  if( _.process._eventCallbackMap[ event ] )
   return true;
-
   return false;
+}
+
+// --
+// meta
+// --
+
+function ExportTo( dstGlobal, srcGlobal )
+{
+  _.assert( _.mapIs( srcGlobal.wTools.process ) );
+  _.mapExtend( dstGlobal.wTools, { process : srcGlobal.wTools.process });
+  if( typeof module !== 'undefined' && module !== null );
+  module[ 'exports' ] = dstGlobal.wTools.process;
 }
 
 // --
 // declare
 // --
 
-let Fields =
+let _eventCallbackMap =
 {
-  _watcher : null,
+  subprocessStartBegin  : [],
+  subprocessStartEnd  : [],
+  // subprocessTerminationBegin  : [],
+  subprocessTerminationEnd  : []
 }
 
-let Routines =
+let NamespaceBlueprint = 
 {
-  watchMaking,
-  unwatchMaking,
-  watcherIsAlive,
+  watcherEnable,
+  watcherDisable,
+  watcherIsEnabled,
 }
 
-_.mapExtend( Self, Fields );
-_.mapExtend( Self, Routines );
+_.construction.extend( _.process, NamespaceBlueprint );
 
 // --
 // export
 // --
 
+if( _realGlobal_ !== _global_ )
+return ExportTo( _realGlobal_, _global_ );
+
 if( typeof module !== 'undefined' && module !== null )
-module[ 'exports' ] = _;
+module[ 'exports' ] = _.process;
 
 })();
