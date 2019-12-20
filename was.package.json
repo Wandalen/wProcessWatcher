@@ -1,6 +1,6 @@
 {
   "name" : "wprocesswatcher", 
-  "version" : "0.3.205", 
+  "version" : "0.3.206", 
   "description" : "Collection of routines to watch child process. Register/unregister handlers for child process start/close.", 
   "license" : "MIT", 
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
