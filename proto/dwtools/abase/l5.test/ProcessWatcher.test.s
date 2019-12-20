@@ -669,9 +669,6 @@ function spawnError( test )
   let startBegin = 0;
   let startEnd = 0;
   let endCounter = 0;
-  let subprocessStartBeginGot;
-  let subprocessStartEndGot;
-  let subprocessTerminationEndGot;
   
   var expectedArguments = 
   [
@@ -687,7 +684,6 @@ function spawnError( test )
   
   let subprocessStartBegin = ( o ) =>
   {
-    subprocessStartBeginGot = o;
     test.identical( o.process, null );
     test.identical( o.arguments, expectedArguments );
     startBegin++
@@ -695,14 +691,10 @@ function spawnError( test )
   
   let subprocessStartEnd = ( o ) => 
   { 
-    subprocessStartEndGot = o;
-    test.is( o.process instanceof ChildProcess.ChildProcess );
-    test.identical( o.arguments, expectedArguments );
     startEnd++
   }
   let subprocessTerminationEnd = ( o ) => 
   { 
-    subprocessTerminationEndGot = o;
     endCounter++
   }
 
@@ -730,8 +722,8 @@ function spawnError( test )
     test.notIdentical( got.exitCode, 0 );
     
     test.identical( startBegin, 1 );
-    test.identical( startEnd, 1 );
-    test.identical( endCounter, 1 );
+    test.identical( startEnd, 0 );
+    test.identical( endCounter, 0 );
     
     _.process.off( 'subprocessStartBegin', subprocessStartBegin )
     _.process.off( 'subprocessStartEnd', subprocessStartEnd )
@@ -764,6 +756,7 @@ var Proto =
   routineTimeOut : 60000,
   onSuiteBegin : suiteBegin,
   onSuiteEnd : suiteEnd,
+  processWatching : 0,
 
   context :
   {

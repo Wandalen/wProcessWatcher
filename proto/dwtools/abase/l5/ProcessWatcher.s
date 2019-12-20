@@ -5,7 +5,7 @@
 /**
  * Collection of routines to watch child process. Register/unregister handlers for child process start/close.
   @module Tools/base/ProcessWatcher
-*/
+ */
 
 /**
  * @file ProcessWatcher.s.
@@ -19,9 +19,17 @@ if( typeof module !== 'undefined' )
   _.include( 'wProcedure' )
 }
 
-let ChildProcess;
 let _global = _global_;
 let _ = _global_.wTools;
+
+if( _realGlobal_ !== _global_ )
+if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process._watcher )
+return ExportTo( _global_, _realGlobal_ );
+
+_.assert( !!_global_.wTools, 'Does not have wTools' );
+_.assert( _global_.wTools.process === undefined || _global_.wTools.process._watcher === undefined, 'wProcessWatcher is already defined' );
+
+let ChildProcess;
 let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
 
 //
@@ -47,8 +55,6 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
  */
 
-let watcherEnabledTimes = 0;
-
 function watcherEnable()
 { 
   _.assert( arguments.length === 0 );
@@ -64,7 +70,7 @@ function watcherEnable()
       _.process._watcher.onEnd = [];
       _.process._watcher.onPatch = [];
     }
-
+    
     patch( 'spawn' );
     patch( 'fork' );
     patch( 'execFile' );
@@ -74,14 +80,12 @@ function watcherEnable()
     _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
     
     _.process.on( 'exit', () => 
-    {
+    { 
       if( _.process.watcherIsEnabled() )
-      throw _.err( 'ProcessWatcher was not disabled.' )
+      _.process.watcherDisable(); 
     })
     
   }
-  
-  watcherEnabledTimes += 1;
   
   return true;
   
@@ -101,12 +105,16 @@ function watcherEnable()
       var o = 
       {
         arguments : Array.prototype.slice.call( arguments ),
-        process : null
+        process : null,
+        sync : 0
       }
       
       _eventHandle( 'subprocessStartBegin', o )
       
       o.process = original.apply( ChildProcess, arguments );
+      
+      if( !_.numberIs( o.process.pid ) )
+      return o.process;
       
       let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ });
       
@@ -138,7 +146,8 @@ function watcherEnable()
       var o = 
       {
         arguments : Array.prototype.slice.call( arguments ),
-        process : null
+        process : null,
+        sync : 1
       }
       let procedure = _.procedure.begin({});
       _eventHandle( 'subprocessStartBegin', o )
@@ -192,14 +201,6 @@ function watcherEnable()
 
 function watcherDisable()
 {  
-  if( !watcherEnabledTimes )
-  return;
-  
-  watcherEnabledTimes -= 1;
-  
-  if( watcherEnabledTimes )
-  return;
-    
   _.each( _eventCallbackMap, ( handlers, event ) => 
   { 
     if( !_.process._eventCallbackMap[ event ] )
@@ -235,11 +236,23 @@ function watcherDisable()
 //
 
 function watcherIsEnabled()
-{
+{ 
   for( var event in _eventCallbackMap )
   if( _.process._eventCallbackMap[ event ] )
   return true;
   return false;
+}
+
+// --
+// meta
+// --
+
+function ExportTo( dstGlobal, srcGlobal )
+{
+  _.assert( _.mapIs( srcGlobal.wTools.process ) );
+  _.mapExtend( dstGlobal.wTools, { process : srcGlobal.wTools.process });
+  if( typeof module !== 'undefined' && module !== null );
+  module[ 'exports' ] = dstGlobal.wTools.process;
 }
 
 // --
@@ -271,6 +284,9 @@ _.mapExtend( Self, Routines );
 // --
 // export
 // --
+
+if( _realGlobal_ !== _global_ )
+return ExportTo( _realGlobal_, _global_ );
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = _;
