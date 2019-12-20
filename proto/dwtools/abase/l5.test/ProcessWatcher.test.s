@@ -659,6 +659,99 @@ function patchHomeDir( test )
   })
 }
 
+//
+
+function spawnError( test )
+{
+  let self = this;
+
+  let start = _.process.starter({ deasync : 1, mode : 'spawn' });
+  let startBegin = 0;
+  let startEnd = 0;
+  let endCounter = 0;
+  let subprocessStartBeginGot;
+  let subprocessStartEndGot;
+  let subprocessTerminationEndGot;
+  
+  var expectedArguments = 
+  [
+    'nnooddee',
+    [],
+    {
+      'stdio' : 'pipe',
+      'detached' : false,
+      'cwd' : process.cwd(),
+      'windowsHide' : true
+    }
+  ]
+  
+  let subprocessStartBegin = ( o ) =>
+  {
+    subprocessStartBeginGot = o;
+    test.identical( o.process, null );
+    test.identical( o.arguments, expectedArguments );
+    startBegin++
+  }
+  
+  let subprocessStartEnd = ( o ) => 
+  { 
+    subprocessStartEndGot = o;
+    test.is( o.process instanceof ChildProcess.ChildProcess );
+    test.identical( o.arguments, expectedArguments );
+    startEnd++
+  }
+  let subprocessTerminationEnd = ( o ) => 
+  { 
+    subprocessTerminationEndGot = o;
+    endCounter++
+  }
+
+  test.identical( startBegin, 0 );
+  test.identical( startEnd, 0 );
+  test.identical( endCounter, 0 );
+  
+  _.process.watcherEnable();
+  
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin )
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
+  
+  let ready = test.shouldThrowErrorAsync( start( 'nnooddee' ) );
+  
+  ready.then( ( got ) => 
+  {
+    
+    test.notIdentical( got.exitCode, 0 );
+    
+    test.identical( startBegin, 1 );
+    test.identical( startEnd, 1 );
+    test.identical( endCounter, 1 );
+    
+    _.process.off( 'subprocessStartBegin', subprocessStartBegin )
+    _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+    _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+    
+    _.process.watcherDisable();
+    
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    
+    return null;
+  })
+  
+  return ready;
+}
+
 // --
 // test
 // --
@@ -693,7 +786,9 @@ var Proto =
     
     watcherDisable,
     
-    patchHomeDir
+    patchHomeDir,
+    
+    spawnError
   },
 
 }
