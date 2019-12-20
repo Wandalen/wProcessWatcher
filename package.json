@@ -1,34 +1,50 @@
 {
-  "name" : "wprocesswatcher", 
-  "version" : "0.3.204", 
-  "description" : "Collection of routines to watch child process. Register/unregister handlers for child process start/close.", 
-  "license" : "MIT", 
-  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
-  "enabled" : 1, 
-  "contributors" : 
-  [
-    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" }, 
-    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }
-  ], 
-  "main" : "proto/dwtools/abase/l5/ProcessWatcher.s", 
-  "files" : [ "proto/dwtools/abase/l5", "proto/dwtools/Tools.s", "out" ], 
-  "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" }, 
-  "repository" : 
-  {
-    "type" : "git", 
-    "url" : "https://github.com/Wandalen/wProcessWatcher.git"
-  }, 
-  "bugs" : 
-  {
-    "url" : "https://github.com/Wandalen/wProcessWatcher/issues"
-  }, 
-  "dependencies" : 
-  {
-    "wTools" : "alpha", 
-    "wProto" : "alpha", 
-    "wCopyable" : "alpha", 
-    "wprocedure" : "alpha"
-  }, 
-  "devDependencies" : { "wTesting" : "alpha", "wappbasic" : "alpha" }, 
-  "keywords" : [ "wTools", "watch", "child process" ]
+  "name": "wprocesswatcher",
+  "version": "0.3.204",
+  "description": "Collection of routines to watch child process. Register/unregister handlers for child process start/close.",
+  "license": "MIT",
+  "author": "Kostiantyn Wandalen <wanalen@willbe.so>",
+  "enabled": 1,
+  "contributors": [
+    {
+      "name": "Kostiantyn Wandalen",
+      "email": "wanalen@willbe.so"
+    },
+    {
+      "name": "Volodymyr M.",
+      "email": "volodymyr.migdal@gmail.com"
+    }
+  ],
+  "main": "proto/dwtools/abase/l5/ProcessWatcher.s",
+  "files": [
+    "proto/dwtools/abase/l5",
+    "proto/dwtools/Tools.s",
+    "out"
+  ],
+  "scripts": {
+    "test": "wtest .run proto/**",
+    "docgen": "wdocgen proto"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wProcessWatcher.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Wandalen/wProcessWatcher/issues"
+  },
+  "dependencies": {
+    "wTools": "alpha",
+    "wProto": "alpha",
+    "wCopyable": "alpha",
+    "wprocedure": "alpha"
+  },
+  "devDependencies": {
+    "wTesting": "alpha",
+    "wappbasic": "alpha"
+  },
+  "keywords": [
+    "wTools",
+    "watch",
+    "child process"
+  ]
 }
