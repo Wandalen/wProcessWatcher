@@ -69,6 +69,7 @@ function watcherEnable()
     patch( 'execFile' );
     patchSync( 'spawnSync' )
     patchSync( 'execFileSync' )
+    patchSync( 'execSync' )
     
     _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
     
@@ -210,6 +211,7 @@ function watcherDisable()
     unpatch( 'execFile' );
     unpatch( 'spawnSync' )
     unpatch( 'execFileSync' )
+    unpatch( 'execSync' )
     ChildProcess = null;
   }
 
