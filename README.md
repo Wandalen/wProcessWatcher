@@ -12,32 +12,41 @@ node sample/Sample.s
 
 ```javascript
 var _ = require( 'wTools' );
-_.include( 'wProcessWatcher' );
-_.include( 'wFiles' );
+_.include( 'wProcessWatcher' )
 
-function subprocessStartEnd( o )
+var ChildProcess = require( 'child_process' )
+var args = [ '-e', `"console.log( require( 'os' ).homedir() )"` ]
+var options = { stdio : 'inherit', shell : true };
+
+console.log( 'Homedir before arguments patching:' );
+ChildProcess.spawnSync( 'node', args, options, );
+
+function subprocessStartBegin( o )
 {
-  console.log( 'New child process with pid:', o.process.pid );
+  o.arguments[ 2 ].env = 
+  {
+    'USERPROFILE' : 'C:\\some\\path',
+    'HOME' : '/some/path'
+  }
 }
 
 _.process.watcherEnable();
-_.process.on( 'subprocessStartEnd', subprocessStartEnd )
+_.process.on( 'subprocessStartBegin', subprocessStartBegin )
 
-_.process.start
-({ 
-  execPath : 'node -v',
-  outputPiping : 0,
-  inputMirroring : 0,
-  deasync : 1 
-});
+console.log( '\nHomedir after arguments patching:' );
+ChildProcess.spawnSync( 'node', args, options );
 
-_.process.off( 'subprocessStartEnd', subprocessStartEnd )
+_.process.off( 'subprocessStartBegin', subprocessStartBegin )
 _.process.watcherDisable();
 
 /* 
 Output:
+Homedir before arguments patching:
+C:\Users\fov
 
-New child process with pid: 2536
+Homedir after arguments patching:
+C:\some\path
 
 */
+
 ```
