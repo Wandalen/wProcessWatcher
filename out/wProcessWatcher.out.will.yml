@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wProcessWatcher.out
 consistency:
-  wProcessWatcher.out.will.yml: &ref_0
-    hash: 00625ee7d9f4c69c1475ae1d06e5ec1b
-    size: 39070
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: fe5787c9196055fa8f17ff2e509470eb
     size: 1869
-  ../.im.will.yml: &ref_2
-    hash: 7b60b5ed5bd4f74f13db8ba4191ea065
-    size: 5268
+  ../.im.will.yml: &ref_1
+    hash: 1fa7669507a1a3a491dcfb38de60b5ff
+    size: 5230
 module:
   wProcessWatcher.out:
     about:
@@ -21,21 +18,21 @@ module:
         handlers for child process start/close.
       enabled: 1
       version: 0.4.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - watch
         - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@willbe.so>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -183,6 +180,10 @@ module:
         path: 'npm:///wprocedure'
         autoExporting: 0
         enabled: 0
+      wAppBasic:
+        path: 'npm:///wappbasic'
+        autoExporting: 0
+        enabled: 0
       wProcessWatcher:
         path: 'hd://..'
         autoExporting: 0
@@ -191,12 +192,6 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
-      wAppBasic:
-        path: 'npm:///wappbasic'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -716,24 +711,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          reflector: 'reflector::exported.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          reflector: 'reflector::exported.files.proto.export*'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -822,9 +799,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wProcessWatcher.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wProcessWatcher
@@ -834,23 +810,13 @@ module:
         handlers for child process start/close.
       enabled: 1
       version: 0.4.0
-      interpreters:
-        - njs >= 8.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - watch
-        - child process
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@willbe.so>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
+      contributors: *ref_4
       npm.name: wprocesswatcher
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -976,6 +942,10 @@ module:
         path: 'npm:///wprocedure'
         autoExporting: 0
         enabled: 0
+      wAppBasic:
+        path: 'npm:///wappbasic'
+        autoExporting: 0
+        enabled: 0
       wProcessWatcher:
         path: 'hd://.'
         autoExporting: 0
@@ -984,12 +954,6 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
-        autoExporting: 0
-        enabled: 0
-        criterion:
-          development: 1
-      wAppBasic:
-        path: 'npm:///wappbasic'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -1538,6 +1502,5 @@ module:
         hash: fe5787c9196055fa8f17ff2e509470eb
         size: 1869
       ../.im.will.yml:
-        hash: 7b60b5ed5bd4f74f13db8ba4191ea065
-        size: 5268
-      wProcessWatcher.out.will.yml: *ref_0
+        hash: 1fa7669507a1a3a491dcfb38de60b5ff
+        size: 5230
