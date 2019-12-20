@@ -7,11 +7,11 @@ if( typeof module !== 'undefined' )
 
   let _ = require( '../../Tools.s' );
 
+  require( '../l5/ProcessWatcher.s' );
+  
   _.include( 'wTesting' );
   _.include( 'wFiles' );
   _.include( 'wAppBasic' );
-
-  require( '../l5/ProcessWatcher.s' );
 
   var ChildProcess = require( 'child_process' );
 

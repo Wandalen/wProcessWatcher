@@ -23,11 +23,11 @@ let _global = _global_;
 let _ = _global_.wTools;
 
 if( _realGlobal_ !== _global_ )
-if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process._watcher )
+if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process.watcherEnable )
 return ExportTo( _global_, _realGlobal_ );
 
 _.assert( !!_global_.wTools, 'Does not have wTools' );
-_.assert( _global_.wTools.process === undefined || _global_.wTools.process._watcher === undefined, 'wProcessWatcher is already defined' );
+_.assert( _global_.wTools.process === undefined || _global_.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
 
 let ChildProcess;
 let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
@@ -63,14 +63,6 @@ function watcherEnable()
   {
     ChildProcess = require( 'child_process' );
 
-    if( _.process._watcher === null )
-    {
-      _.process._watcher = Object.create( null );
-      _.process._watcher.onBegin = [];
-      _.process._watcher.onEnd = [];
-      _.process._watcher.onPatch = [];
-    }
-    
     patch( 'spawn' );
     patch( 'fork' );
     patch( 'execFile' );
@@ -267,19 +259,14 @@ let _eventCallbackMap =
   subprocessTerminationEnd  : []
 }
 
-let Fields =
+let NamespaceBlueprint = 
 {
-}
-
-let Routines =
-{ 
   watcherEnable,
   watcherDisable,
   watcherIsEnabled,
 }
 
-_.mapExtend( Self, Fields );
-_.mapExtend( Self, Routines );
+_.construction.extend( _.process, NamespaceBlueprint );
 
 // --
 // export
@@ -289,6 +276,6 @@ if( _realGlobal_ !== _global_ )
 return ExportTo( _realGlobal_, _global_ );
 
 if( typeof module !== 'undefined' && module !== null )
-module[ 'exports' ] = _;
+module[ 'exports' ] = _.process;
 
 })();
