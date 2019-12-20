@@ -460,8 +460,7 @@ function execSync( test )
   var expectedArguments =
   [
     'node "-v"',
-    { 'env' : null, 'cwd' : process.cwd(), 'shell' : true },
-    undefined
+    { 'env' : null, 'cwd' : process.cwd() },
   ]
   
   let subprocessStartEnd = ( o ) => 
@@ -473,7 +472,7 @@ function execSync( test )
   let subprocessTerminationEnd = ( o ) => 
   { 
     test.identical( o.process, null );
-    test.is( _.bufferRawIs( o.returned ) );
+    test.is( _.bufferAnyIs( o.returned ) );
     test.identical( o.arguments, expectedArguments );
     endCounter++
   }
