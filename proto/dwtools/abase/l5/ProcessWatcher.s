@@ -17,6 +17,7 @@ if( typeof module !== 'undefined' )
   let _ = require( '../../Tools.s' );
   _.include( 'wProto' )
   _.include( 'wProcedure' )
+  _.include( 'wAppBasic' )
 }
 
 let _global = _global_;

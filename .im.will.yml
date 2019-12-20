@@ -13,6 +13,9 @@ submodule :
   wProcedure :
     path : npm:///wprocedure
     enabled : 0 # submodule
+  wAppBasic :
+    path : npm:///wappbasic
+    enabled : 0 # submodule
   wProcessWatcher :
     path : hd://.
     enabled : 0 # submodule

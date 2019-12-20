@@ -27,7 +27,8 @@
     "wTools" : "", 
     "wProto" : "", 
     "wCopyable" : "", 
-    "wprocedure" : ""
+    "wprocedure" : "",
+    "wappbasic" : ""
   }, 
   "devDependencies" : { "wTesting" : "", "wappbasic" : "" }, 
   "keywords" : [ "wTools", "watch", "child process" ]
