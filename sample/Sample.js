@@ -1,22 +1,25 @@
-var _ = require( '..' )
-_.include( 'wAppBasic' )
-_.include( 'wFiles' )
+var _ = require( 'wTools' );
+_.include( 'wProcessWatcher' );
+_.include( 'wFiles' );
 
-function onBegin( o )
+function subprocessStartEnd( o )
 {
   console.log( '\n=Begin=' );
   console.log( 'arguments:', o.arguments );
   console.log( 'process pid:', o.process.pid );
 }
 
-function onEnd( o )
+function subprocessTerminationEnd( o )
 {
   console.log( '\n=End=' );
   console.log( 'arguments:', o.arguments );
   console.log( 'process pid:', o.process.pid );
 }
 
-var watcher = _.process.watchMaking({ onBegin, onEnd })
+_.process.watcherEnable();
+
+_.process.on( 'subprocessStartEnd', subprocessStartEnd )
+_.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
 _.process.start
 ({ 
@@ -24,7 +27,10 @@ _.process.start
   deasync : 1 
 });
 
-watcher.unwatch();
+_.process.off( 'subprocessStartEnd', subprocessStartEnd )
+_.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+_.process.watcherDisable();
 
 _.process.start
 ({ 
