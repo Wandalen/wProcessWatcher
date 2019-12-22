@@ -2,10 +2,13 @@ format: outwillfile-2.0
 root:
   - wProcessWatcher.out
 consistency:
-  ../.ex.will.yml: &ref_0
+  wProcessWatcher.out.will.yml: &ref_0
+    hash: 44ddc1cbbc4764247567ae6d68e28d49
+    size: 38982
+  ../.ex.will.yml: &ref_1
     hash: fe5787c9196055fa8f17ff2e509470eb
     size: 1869
-  ../.im.will.yml: &ref_1
+  ../.im.will.yml: &ref_2
     hash: 1fa7669507a1a3a491dcfb38de60b5ff
     size: 5230
 module:
@@ -18,21 +21,21 @@ module:
         handlers for child process start/close.
       enabled: 1
       version: 0.4.0
-      interpreters: &ref_2
+      interpreters:
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
+      keywords:
         - wTools
         - watch
         - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors: &ref_4
+      contributors:
         - Kostiantyn Wandalen <wanalen@willbe.so>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts: &ref_5
+      npm.scripts:
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -711,6 +714,24 @@ module:
           content: prime
         inherit:
           - files.transpile
+      exported.proto.export:
+        opts:
+          reflector: 'reflector::exported.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
+      exported.files.proto.export:
+        opts:
+          reflector: 'reflector::exported.files.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
     build:
       proto.export:
         steps:
@@ -799,8 +820,9 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      wProcessWatcher.out.will.yml: *ref_0
+      ../.ex.will.yml: *ref_1
+      ../.im.will.yml: *ref_2
   ../:
     about:
       name: wProcessWatcher
@@ -810,13 +832,23 @@ module:
         handlers for child process start/close.
       enabled: 1
       version: 0.4.0
-      interpreters: *ref_2
-      keywords: *ref_3
+      interpreters:
+        - njs >= 8.0.0
+        - chrome >= 60.0.0
+        - firefox >= 60.0.0
+      keywords:
+        - wTools
+        - watch
+        - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors: *ref_4
+      contributors:
+        - Kostiantyn Wandalen <wanalen@willbe.so>
+        - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts: *ref_5
+      npm.scripts:
+        test: wtest .run proto/**
+        docgen: wdocgen .build proto
     path:
       module.willfiles:
         criterion:
@@ -1504,3 +1536,6 @@ module:
       ../.im.will.yml:
         hash: 1fa7669507a1a3a491dcfb38de60b5ff
         size: 5230
+      wProcessWatcher.out.will.yml:
+        hash: 44ddc1cbbc4764247567ae6d68e28d49
+        size: 38982
