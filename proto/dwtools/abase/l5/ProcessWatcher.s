@@ -57,9 +57,9 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
  */
 
 function watcherEnable()
-{ 
+{
   _.assert( arguments.length === 0 );
-  
+
   if( !ChildProcess )
   {
     ChildProcess = require( 'child_process' );
@@ -70,20 +70,23 @@ function watcherEnable()
     patchSync( 'spawnSync' )
     patchSync( 'execFileSync' )
     patchSync( 'execSync' )
-    
+
     _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
-    
-    _.process.on( 'exit', () => 
-    { 
-      if( _.process.watcherIsEnabled() )
-      _.process.watcherDisable(); 
-    })
-    
+
+    /* qqq : ?? */
+    // _.process.on( 'exit', () =>
+    // {
+    //   if( _.process.watcherIsEnabled() )
+    //   _.process.watcherDisable();
+    // })
+
   }
-  
+
   return true;
-  
+
   /*  */
+
+  // qqq : why 2 different suroutines?
 
   function patch( routine )
   {
@@ -95,36 +98,36 @@ function watcherEnable()
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
     ChildProcess[ routine ] = function()
-    { 
-      var o = 
+    {
+      var o =
       {
         arguments : Array.prototype.slice.call( arguments ),
         process : null,
         sync : 0
       }
-      
+
       _eventHandle( 'subprocessStartBegin', o )
-      
+
       o.process = original.apply( ChildProcess, arguments );
-      
+
       if( !_.numberIs( o.process.pid ) )
       return o.process;
-      
-      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ });
-      
+
+      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ }); /* qqq : ? */
+
       _eventHandle( 'subprocessStartEnd', o )
-      
-      o.process.on( 'close', () => 
-      {  
+
+      o.process.on( 'close', () =>
+      {
         procedure.end();
         _eventHandle( 'subprocessTerminationEnd', o );
       });
-      
+
       return o.process;
     }
   }
 
-  //
+  /* */
 
   function patchSync( routine )
   {
@@ -136,8 +139,8 @@ function watcherEnable()
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
     ChildProcess[ routine ] = function()
-    { 
-      var o = 
+    {
+      var o =
       {
         arguments : Array.prototype.slice.call( arguments ),
         process : null,
@@ -152,9 +155,9 @@ function watcherEnable()
       return o.returned;
     }
   }
-  
+
   function _eventHandle( event, o )
-  { 
+  {
     if( !_.process._eventCallbackMap[ event ].length )
     return;
 
@@ -194,16 +197,23 @@ function watcherEnable()
  */
 
 function watcherDisable()
-{  
-  _.each( _eventCallbackMap, ( handlers, event ) => 
-  { 
+{
+
+  _.each( _eventCallbackMap, ( handlers, event ) =>
+  {
     if( !_.process._eventCallbackMap[ event ] )
     return;
     if( _.process._eventCallbackMap, handlers.length )
-    throw _.err( 'Event', event, 'has', handlers.length,  'registered handlers.\nPlease use _.process.off to unregister handlers.' );
+    {
+      debugger;
+      throw _.err( 'Event', event, 'has', handlers.length, 'registered handlers.\nPlease use _.process.off to unregister handlers.' );
+      // qqq : use ` instead
+      // qqq : not enough information!
+      // qqq : bad naming. not "event"
+    }
     delete Self._eventCallbackMap[ event ];
   })
-  
+
   if( ChildProcess )
   {
     unpatch( 'spawn' );
@@ -231,7 +241,7 @@ function watcherDisable()
 //
 
 function watcherIsEnabled()
-{ 
+{
   for( var event in _eventCallbackMap )
   if( _.process._eventCallbackMap[ event ] )
   return true;
@@ -262,7 +272,7 @@ let _eventCallbackMap =
   subprocessTerminationEnd  : []
 }
 
-let NamespaceBlueprint = 
+let NamespaceBlueprint =
 {
   watcherEnable,
   watcherDisable,
