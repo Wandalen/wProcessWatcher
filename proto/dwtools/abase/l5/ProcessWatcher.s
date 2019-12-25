@@ -23,9 +23,9 @@ if( typeof module !== 'undefined' )
 let _global = _global_;
 let _ = _global_.wTools;
 
-if( _realGlobal_ !== _global_ )
-if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process.watcherEnable )
-return ExportTo( _global_, _realGlobal_ );
+// if( _realGlobal_ !== _global_ )
+// if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process.watcherEnable )
+// return ExportTo( _global_, _realGlobal_ );
 
 _.assert( !!_global_.wTools, 'Does not have wTools' );
 _.assert( _global_.wTools.process === undefined || _global_.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
@@ -252,13 +252,13 @@ function watcherIsEnabled()
 // meta
 // --
 
-function ExportTo( dstGlobal, srcGlobal )
-{
-  _.assert( _.mapIs( srcGlobal.wTools.process ) );
-  _.mapExtend( dstGlobal.wTools, { process : srcGlobal.wTools.process });
-  if( typeof module !== 'undefined' && module !== null );
-  module[ 'exports' ] = dstGlobal.wTools.process;
-}
+// function ExportTo( dstGlobal, srcGlobal )
+// {
+//   _.assert( _.mapIs( srcGlobal.wTools.process ) );
+//   _.mapExtend( dstGlobal.wTools, { process : srcGlobal.wTools.process });
+//   if( typeof module !== 'undefined' && module !== null );
+//   module[ 'exports' ] = dstGlobal.wTools.process;
+// }
 
 // --
 // declare
@@ -285,8 +285,8 @@ _.construction.extend( _.process, NamespaceBlueprint );
 // export
 // --
 
-if( _realGlobal_ !== _global_ )
-return ExportTo( _realGlobal_, _global_ );
+// if( _realGlobal_ !== _global_ )
+// return ExportTo( _realGlobal_, _global_ );
 
 if( typeof module !== 'undefined' && module !== null )
 module[ 'exports' ] = _.process;
