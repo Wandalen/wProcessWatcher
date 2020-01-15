@@ -207,10 +207,15 @@ function watcherDisable()
   {
     if( !process._eventCallbackMap[ eventName ] )
     return;
-    if( process._eventCallbackMap, handlers.length )
-    {
-      debugger;
-      throw _.err( `Event ${eventName} has ${handlers.length} registered handlers.\nPlease use _.process.off to unregister handlers.` );
+    if( handlers.length )
+    { 
+      let errMsg;
+      if( handlers.length === 1 )
+      errMsg = `Event ${eventName} has registered handler "${handlers[ 0 ].name}".`;
+      else
+      errMsg = `Event ${eventName} has ${handlers.length} registered handlers.`;
+      debugger
+      throw _.err( errMsg + '\nPlease use _.process.off to unregister handlers.' );
       // qqq : use ` instead
       // qqq : not enough information!
       // qqq : bad naming. not "event"
