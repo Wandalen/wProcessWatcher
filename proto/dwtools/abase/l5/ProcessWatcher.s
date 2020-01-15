@@ -210,15 +210,25 @@ function watcherDisable()
     if( handlers.length )
     { 
       let errMsg;
-      if( handlers.length === 1 )
-      errMsg = `Event ${eventName} has registered handler "${handlers[ 0 ].name}".`;
+      
+      if( Config.debug )
+      { 
+        let locations = handlers.map( ( handler ) => handler._callLocation ).join( '\n ' );
+        errMsg = `Event ${eventName} has registered handlers:\n ${locations}`;
+      }
       else
-      errMsg = `Event ${eventName} has ${handlers.length} registered handlers.`;
-      debugger
+      { 
+        if( handlers.length === 1 )
+        errMsg = `Event ${eventName} has registered handler "${handlers[ 0 ].name}".`;
+        else
+        errMsg = `Event ${eventName} has ${handlers.length} registered handlers.`;
+      }
+      
       throw _.err( errMsg + '\nPlease use _.process.off to unregister handlers.' );
       // qqq : use ` instead
       // qqq : not enough information!
       // qqq : bad naming. not "event"
+      ///qqq Vova: done
     }
     delete process._eventCallbackMap[ eventName ];
   })
@@ -258,6 +268,26 @@ function watcherIsEnabled()
   return false;
 }
 
+//
+
+let _on = _.process.on;
+function on()
+{  
+  if( arguments.length === 2 )
+  if( _eventCallbackMap[ arguments[ 0 ] ] )
+  {  
+    _.assert( _.routineIs( arguments[ 1 ] ) );
+    arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+  }
+  let o2 = _on.apply( this, arguments );
+  return o2;
+}
+
+on.defaults =
+{
+  callbackMap : null,
+}
+
 // --
 // meta
 // --
@@ -290,6 +320,10 @@ let NamespaceBlueprint =
 }
 
 _.construction.extend( _.process, NamespaceBlueprint );
+
+if( Config.debug )
+_.construction.extend( _.process, { on } );
+
 
 // --
 // export

@@ -606,6 +606,7 @@ function execFileSync( test )
 function watcherDisable( test )
 {
   let subprocessStartBegin = () => {}
+  let subprocessStartBegin2 = () => {}
   
   test.case = 'disabled try to disable again'
   test.mustNotThrowError( () => _.process.watcherDisable() );
@@ -614,11 +615,13 @@ function watcherDisable( test )
   _.process.watcherEnable();
   test.is( _.process.watcherIsEnabled() )
   _.process.on( 'subprocessStartBegin', subprocessStartBegin );
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin2 );
   test.shouldThrowErrorSync( () => _.process.watcherDisable() );
   test.is( _.process.watcherIsEnabled() )
   
   test.case = 'unregister handler then disable watcher'
   _.process.off( 'subprocessStartBegin', subprocessStartBegin );
+  _.process.off( 'subprocessStartBegin', subprocessStartBegin2 );
   _.process.watcherDisable()
   test.is( !_.process.watcherIsEnabled() )
   
