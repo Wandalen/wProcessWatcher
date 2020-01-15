@@ -59,28 +59,25 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
 function watcherEnable()
 {
   _.assert( arguments.length === 0 );
+  
+  if( !ChildProcess  )
+  ChildProcess = require( 'child_process' );
+  
+  patch( 'spawn' );
+  patch( 'fork' );
+  patch( 'execFile' );
+  patchSync( 'spawnSync' )
+  patchSync( 'execFileSync' )
+  patchSync( 'execSync' )
 
-  if( !ChildProcess )
-  {
-    ChildProcess = require( 'child_process' );
+  _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
 
-    patch( 'spawn' );
-    patch( 'fork' );
-    patch( 'execFile' );
-    patchSync( 'spawnSync' )
-    patchSync( 'execFileSync' )
-    patchSync( 'execSync' )
-
-    _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
-
-    /* qqq : ?? */
-    // _.process.on( 'exit', () =>
-    // {
-    //   if( _.process.watcherIsEnabled() )
-    //   _.process.watcherDisable();
-    // })
-
-  }
+  /* qqq : ?? */
+  // _.process.on( 'exit', () =>
+  // {
+  //   if( _.process.watcherIsEnabled() )
+  //   _.process.watcherDisable();
+  // })
 
   return true;
 
@@ -93,7 +90,9 @@ function watcherEnable()
     let _routine = _.strPrependOnce( routine, '_' );
 
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
-    _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
+    
+    if( _.routineIs( ChildProcess[ _routine ] ) )
+    return true;
 
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
@@ -134,7 +133,8 @@ function watcherEnable()
     let _routine = _.strPrependOnce( routine, '_' );
 
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
-    _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
+    if( _.routineIs( ChildProcess[ _routine ] ) )
+    return true;
 
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
 
@@ -157,16 +157,20 @@ function watcherEnable()
   }
 
   function _eventHandle( event, o )
-  {
-    if( !_.process._eventCallbackMap[ event ].length )
+  { 
+    let process = _realGlobal_.wTools.process;
+    
+    if( !process.watcherIsEnabled() )
+    return;
+    if( !process._eventCallbackMap[ event ].length )
     return;
 
-    let callbacks = _.process._eventCallbackMap[ event ].slice();
+    let callbacks = process._eventCallbackMap[ event ].slice();
     callbacks.forEach( ( callback ) =>
     {
       try
       {
-        callback.call( _.process, o );
+        callback.call( process, o );
       }
       catch( err )
       {
@@ -198,12 +202,12 @@ function watcherEnable()
 
 function watcherDisable()
 {
-
+  let process = _realGlobal_.wTools.process;
   _.each( _eventCallbackMap, ( handlers, event ) =>
   {
-    if( !_.process._eventCallbackMap[ event ] )
+    if( !process._eventCallbackMap[ event ] )
     return;
-    if( _.process._eventCallbackMap, handlers.length )
+    if( process._eventCallbackMap, handlers.length )
     {
       debugger;
       throw _.err( 'Event', event, 'has', handlers.length, 'registered handlers.\nPlease use _.process.off to unregister handlers.' );
@@ -211,7 +215,7 @@ function watcherDisable()
       // qqq : not enough information!
       // qqq : bad naming. not "event"
     }
-    delete Self._eventCallbackMap[ event ];
+    delete process._eventCallbackMap[ event ];
   })
 
   if( ChildProcess )
@@ -241,9 +245,10 @@ function watcherDisable()
 //
 
 function watcherIsEnabled()
-{
+{ 
+  let process = _realGlobal_.wTools.process;
   for( var event in _eventCallbackMap )
-  if( _.process._eventCallbackMap[ event ] )
+  if( process._eventCallbackMap[ event ] )
   return true;
   return false;
 }
