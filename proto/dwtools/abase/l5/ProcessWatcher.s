@@ -156,16 +156,16 @@ function watcherEnable()
     }
   }
 
-  function _eventHandle( event, o )
+  function _eventHandle( eventName, o )
   { 
     let process = _realGlobal_.wTools.process;
     
     if( !process.watcherIsEnabled() )
     return;
-    if( !process._eventCallbackMap[ event ].length )
+    if( !process._eventCallbackMap[ eventName ].length )
     return;
 
-    let callbacks = process._eventCallbackMap[ event ].slice();
+    let callbacks = process._eventCallbackMap[ eventName ].slice();
     callbacks.forEach( ( callback ) =>
     {
       try
@@ -203,19 +203,19 @@ function watcherEnable()
 function watcherDisable()
 {
   let process = _realGlobal_.wTools.process;
-  _.each( _eventCallbackMap, ( handlers, event ) =>
+  _.each( _eventCallbackMap, ( handlers, eventName ) =>
   {
-    if( !process._eventCallbackMap[ event ] )
+    if( !process._eventCallbackMap[ eventName ] )
     return;
     if( process._eventCallbackMap, handlers.length )
     {
       debugger;
-      throw _.err( 'Event', event, 'has', handlers.length, 'registered handlers.\nPlease use _.process.off to unregister handlers.' );
+      throw _.err( `Event ${eventName} has ${handlers.length} registered handlers.\nPlease use _.process.off to unregister handlers.` );
       // qqq : use ` instead
       // qqq : not enough information!
       // qqq : bad naming. not "event"
     }
-    delete process._eventCallbackMap[ event ];
+    delete process._eventCallbackMap[ eventName ];
   })
 
   if( ChildProcess )
@@ -247,8 +247,8 @@ function watcherDisable()
 function watcherIsEnabled()
 { 
   let process = _realGlobal_.wTools.process;
-  for( var event in _eventCallbackMap )
-  if( process._eventCallbackMap[ event ] )
+  for( var eventName in _eventCallbackMap )
+  if( process._eventCallbackMap[ eventName ] )
   return true;
   return false;
 }
