@@ -1,6 +1,7 @@
 # wProcessWatcher [![Build Status](https://travis-ci.org/Wandalen/wProcessWatcher.svg?branch=master)](https://travis-ci.org/Wandalen/wProcessWatcher)
 
-Collection of routines to watch child process. Register/unregister handlers for child process start/close. Use the module to monitor creation of child processes and obtain information about command,arguments and options used to create the child process.
+Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.
+
 
 ### Try out
 ```
