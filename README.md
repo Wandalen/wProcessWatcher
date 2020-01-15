@@ -14,15 +14,21 @@ node sample/Sample.s
 var _ = require( 'wTools' );
 _.include( 'wProcessWatcher' )
 
-var ChildProcess = require( 'child_process' )
+/* How to change default homedir for new child process by modifying original arguments */
+
+var ChildProcess = require( 'child_process' );
 var args = [ '-e', `"console.log( require( 'os' ).homedir() )"` ]
 var options = { stdio : 'inherit', shell : true };
+
+/* Spawn child process that will print homedir path before using process watcher */
 
 console.log( 'Homedir before arguments patching:' );
 ChildProcess.spawnSync( 'node', args, options, );
 
+/* Enable process watcher and register callback that will be executed before spawning the child process */
+
 function subprocessStartBegin( o )
-{
+{ 
   o.arguments[ 2 ].env = 
   {
     'USERPROFILE' : 'C:\\some\\path',
@@ -33,8 +39,12 @@ function subprocessStartBegin( o )
 _.process.watcherEnable();
 _.process.on( 'subprocessStartBegin', subprocessStartBegin )
 
+/* Spawn child process that will print new homedir path */
+
 console.log( '\nHomedir after arguments patching:' );
 ChildProcess.spawnSync( 'node', args, options );
+
+/* Deregister callback and disable process watcher */
 
 _.process.off( 'subprocessStartBegin', subprocessStartBegin )
 _.process.watcherDisable();
@@ -48,5 +58,4 @@ Homedir after arguments patching:
 C:\some\path
 
 */
-
 ```
