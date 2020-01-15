@@ -66,9 +66,9 @@ function watcherEnable()
   patch( 'spawn' );
   patch( 'fork' );
   patch( 'execFile' );
-  patchSync( 'spawnSync' )
-  patchSync( 'execFileSync' )
-  patchSync( 'execSync' )
+  patch( 'spawnSync' );
+  patch( 'execFileSync' );
+  patch( 'execSync' );
 
   _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
 
@@ -84,6 +84,7 @@ function watcherEnable()
   /*  */
 
   // qqq : why 2 different suroutines?
+  // qqq Vova : merged subroutines
 
   function patch( routine )
   {
@@ -95,9 +96,27 @@ function watcherEnable()
     return true;
 
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
+    let sync = _.strEnds( routine, 'Sync' );
 
     ChildProcess[ routine ] = function()
-    {
+    { 
+      if( sync )
+      {
+        var o =
+        {
+          arguments : Array.prototype.slice.call( arguments ),
+          process : null,
+          sync : 1
+        }
+        let procedure = _.procedure.begin({});
+        _eventHandle( 'subprocessStartBegin', o )
+        _eventHandle( 'subprocessStartEnd', o )
+        o.returned = original.apply( ChildProcess, arguments );
+        procedure.end();
+        _eventHandle( 'subprocessTerminationEnd', o );
+        return o.returned;
+      }
+      
       var o =
       {
         arguments : Array.prototype.slice.call( arguments ),
@@ -127,34 +146,6 @@ function watcherEnable()
   }
 
   /* */
-
-  function patchSync( routine )
-  {
-    let _routine = _.strPrependOnce( routine, '_' );
-
-    _.assert( _.routineIs( ChildProcess[ routine ] ) );
-    if( _.routineIs( ChildProcess[ _routine ] ) )
-    return true;
-
-    let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-
-    ChildProcess[ routine ] = function()
-    {
-      var o =
-      {
-        arguments : Array.prototype.slice.call( arguments ),
-        process : null,
-        sync : 1
-      }
-      let procedure = _.procedure.begin({});
-      _eventHandle( 'subprocessStartBegin', o )
-      _eventHandle( 'subprocessStartEnd', o )
-      o.returned = original.apply( ChildProcess, arguments );
-      procedure.end();
-      _eventHandle( 'subprocessTerminationEnd', o );
-      return o.returned;
-    }
-  }
 
   function _eventHandle( eventName, o )
   { 
