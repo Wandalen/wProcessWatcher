@@ -131,7 +131,8 @@ function watcherEnable()
       if( !_.numberIs( o.process.pid ) )
       return o.process;
 
-      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ }); /* qqq : ? */
+      /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
+      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : o.process */ }); 
 
       _eventHandle( 'subprocessStartEnd', o )
 
