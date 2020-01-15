@@ -227,7 +227,7 @@ function fork( test )
       'silent' : false,
       'env' : null,
       'stdio' : 'pipe',
-      'execArgv' : [],
+      'execArgv' : process.execArgv,
       'cwd' : process.cwd()
     }
   ]
