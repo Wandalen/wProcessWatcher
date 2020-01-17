@@ -111,9 +111,19 @@ function watcherEnable()
         let procedure = _.procedure.begin({});
         _eventHandle( 'subprocessStartBegin', o )
         _eventHandle( 'subprocessStartEnd', o )
-        o.returned = original.apply( ChildProcess, arguments );
-        procedure.end();
-        _eventHandle( 'subprocessTerminationEnd', o );
+        try 
+        {
+          o.returned = original.apply( ChildProcess, arguments );
+        }
+        catch( err )
+        {
+          throw err;
+        }
+        finally
+        {
+          procedure.end();
+          _eventHandle( 'subprocessTerminationEnd', o );
+        }
         return o.returned;
       }
       
