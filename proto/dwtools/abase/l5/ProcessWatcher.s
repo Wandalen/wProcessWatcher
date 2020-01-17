@@ -160,25 +160,32 @@ function watcherEnable()
 
   function _eventHandle( eventName, o )
   { 
-    let process = _realGlobal_.wTools.process;
+    if( _global_._testerGlobal_.wTools.process )
+    _eventHandleFor( _global_._testerGlobal_.wTools.process )
     
-    if( !process.watcherIsEnabled() )
-    return;
-    if( !process._eventCallbackMap[ eventName ].length )
-    return;
-
-    let callbacks = process._eventCallbackMap[ eventName ].slice();
-    callbacks.forEach( ( callback ) =>
-    {
-      try
+    if( _global_._testerGlobal_.wTools.process )
+    _eventHandleFor( _global_.wTools.process )
+    
+    function _eventHandleFor( processNamespace )
+    { 
+      if( !watcherIsEnabled.call( processNamespace ) )
+      return;
+      if( !processNamespace._eventCallbackMap[ eventName ].length )
+      return;
+  
+      let callbacks = processNamespace._eventCallbackMap[ eventName ].slice();
+      callbacks.forEach( ( callback ) =>
       {
-        callback.call( process, o );
-      }
-      catch( err )
-      {
-        throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
-      }
-    });
+        try
+        {
+          callback.call( processNamespace, o );
+        }
+        catch( err )
+        {
+          throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
+        }
+      });
+    }
 
   }
 }
@@ -203,11 +210,11 @@ function watcherEnable()
  */
 
 function watcherDisable()
-{
-  let process = _realGlobal_.wTools.process;
+{ 
+  let processNamespace = this;
   _.each( _eventCallbackMap, ( handlers, eventName ) =>
   {
-    if( !process._eventCallbackMap[ eventName ] )
+    if( !processNamespace._eventCallbackMap[ eventName ] )
     return;
     if( handlers.length )
     { 
@@ -232,7 +239,7 @@ function watcherDisable()
       // qqq : bad naming. not "event"
       ///qqq Vova: done
     }
-    delete process._eventCallbackMap[ eventName ];
+    delete processNamespace._eventCallbackMap[ eventName ];
   })
 
   if( ChildProcess )
@@ -263,9 +270,9 @@ function watcherDisable()
 
 function watcherIsEnabled()
 { 
-  let process = _realGlobal_.wTools.process;
+  let processNamespace = this;
   for( var eventName in _eventCallbackMap )
-  if( process._eventCallbackMap[ eventName ] )
+  if( processNamespace._eventCallbackMap[ eventName ] )
   return true;
   return false;
 }
