@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * Collection of routines to watch child process. Register/unregister handlers for child process start/close.
+ * Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.
   @module Tools/base/ProcessWatcher
  */
 
@@ -59,46 +59,74 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
 function watcherEnable()
 {
   _.assert( arguments.length === 0 );
+  
+  if( !ChildProcess  )
+  ChildProcess = require( 'child_process' );
+  
+  patch( 'spawn' );
+  patch( 'fork' );
+  patch( 'execFile' );
+  patch( 'spawnSync' );
+  patch( 'execFileSync' );
+  patch( 'execSync' );
 
-  if( !ChildProcess )
-  {
-    ChildProcess = require( 'child_process' );
+  _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
 
-    patch( 'spawn' );
-    patch( 'fork' );
-    patch( 'execFile' );
-    patchSync( 'spawnSync' )
-    patchSync( 'execFileSync' )
-    patchSync( 'execSync' )
-
-    _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
-
-    /* qqq : ?? */
-    // _.process.on( 'exit', () =>
-    // {
-    //   if( _.process.watcherIsEnabled() )
-    //   _.process.watcherDisable();
-    // })
-
-  }
+  /* qqq : ?? */
+  // _.process.on( 'exit', () =>
+  // {
+  //   if( _.process.watcherIsEnabled() )
+  //   _.process.watcherDisable();
+  // })
 
   return true;
 
   /*  */
 
   // qqq : why 2 different suroutines?
+  // qqq Vova : merged subroutines
 
   function patch( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
 
     _.assert( _.routineIs( ChildProcess[ routine ] ) );
-    _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
+    
+    if( _.routineIs( ChildProcess[ _routine ] ) )
+    return true;
 
     let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
+    let sync = _.strEnds( routine, 'Sync' );
 
     ChildProcess[ routine ] = function()
-    {
+    { 
+      if( sync )
+      {
+        var o =
+        {
+          arguments : Array.prototype.slice.call( arguments ),
+          process : null,
+          sync : 1
+        }
+        let procedure = _.procedure.begin({});
+        _eventHandle( 'subprocessStartBegin', o )
+        _eventHandle( 'subprocessStartEnd', o )
+        try 
+        {
+          o.returned = original.apply( ChildProcess, arguments );
+        }
+        catch( err )
+        {
+          throw err;
+        }
+        finally
+        {
+          procedure.end();
+          _eventHandle( 'subprocessTerminationEnd', o );
+        }
+        return o.returned;
+      }
+      
       var o =
       {
         arguments : Array.prototype.slice.call( arguments ),
@@ -113,7 +141,8 @@ function watcherEnable()
       if( !_.numberIs( o.process.pid ) )
       return o.process;
 
-      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : childProcess */ }); /* qqq : ? */
+      /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
+      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : o.process */ }); 
 
       _eventHandle( 'subprocessStartEnd', o )
 
@@ -129,50 +158,34 @@ function watcherEnable()
 
   /* */
 
-  function patchSync( routine )
-  {
-    let _routine = _.strPrependOnce( routine, '_' );
-
-    _.assert( _.routineIs( ChildProcess[ routine ] ) );
-    _.assert( !_.routineIs( ChildProcess[ _routine ] ) );
-
-    let original = ChildProcess[ _routine ] = ChildProcess[ routine ];
-
-    ChildProcess[ routine ] = function()
-    {
-      var o =
+  function _eventHandle( eventName, o )
+  { 
+    if( _global_._testerGlobal_.wTools.process )
+    _eventHandleFor( _global_._testerGlobal_.wTools.process )
+    
+    if( _global_._testerGlobal_.wTools.process )
+    _eventHandleFor( _global_.wTools.process )
+    
+    function _eventHandleFor( processNamespace )
+    { 
+      if( !watcherIsEnabled.call( processNamespace ) )
+      return;
+      if( !processNamespace._eventCallbackMap[ eventName ].length )
+      return;
+  
+      let callbacks = processNamespace._eventCallbackMap[ eventName ].slice();
+      callbacks.forEach( ( callback ) =>
       {
-        arguments : Array.prototype.slice.call( arguments ),
-        process : null,
-        sync : 1
-      }
-      let procedure = _.procedure.begin({});
-      _eventHandle( 'subprocessStartBegin', o )
-      _eventHandle( 'subprocessStartEnd', o )
-      o.returned = original.apply( ChildProcess, arguments );
-      procedure.end();
-      _eventHandle( 'subprocessTerminationEnd', o );
-      return o.returned;
+        try
+        {
+          callback.call( processNamespace, o );
+        }
+        catch( err )
+        {
+          throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
+        }
+      });
     }
-  }
-
-  function _eventHandle( event, o )
-  {
-    if( !_.process._eventCallbackMap[ event ].length )
-    return;
-
-    let callbacks = _.process._eventCallbackMap[ event ].slice();
-    callbacks.forEach( ( callback ) =>
-    {
-      try
-      {
-        callback.call( _.process, o );
-      }
-      catch( err )
-      {
-        throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
-      }
-    });
 
   }
 }
@@ -197,21 +210,36 @@ function watcherEnable()
  */
 
 function watcherDisable()
-{
-
-  _.each( _eventCallbackMap, ( handlers, event ) =>
+{ 
+  let processNamespace = this;
+  _.each( _eventCallbackMap, ( handlers, eventName ) =>
   {
-    if( !_.process._eventCallbackMap[ event ] )
+    if( !processNamespace._eventCallbackMap[ eventName ] )
     return;
-    if( _.process._eventCallbackMap, handlers.length )
-    {
-      debugger;
-      throw _.err( 'Event', event, 'has', handlers.length, 'registered handlers.\nPlease use _.process.off to unregister handlers.' );
+    if( handlers.length )
+    { 
+      let errMsg;
+      
+      if( Config.debug )
+      { 
+        let locations = handlers.map( ( handler ) => handler._callLocation ).join( '\n ' );
+        errMsg = `Event ${eventName} has registered handlers:\n ${locations}`;
+      }
+      else
+      { 
+        if( handlers.length === 1 )
+        errMsg = `Event ${eventName} has registered handler "${handlers[ 0 ].name}".`;
+        else
+        errMsg = `Event ${eventName} has ${handlers.length} registered handlers.`;
+      }
+      
+      throw _.err( errMsg + '\nPlease use _.process.off to unregister handlers.' );
       // qqq : use ` instead
       // qqq : not enough information!
       // qqq : bad naming. not "event"
+      ///qqq Vova: done
     }
-    delete Self._eventCallbackMap[ event ];
+    delete processNamespace._eventCallbackMap[ eventName ];
   })
 
   if( ChildProcess )
@@ -241,11 +269,32 @@ function watcherDisable()
 //
 
 function watcherIsEnabled()
-{
-  for( var event in _eventCallbackMap )
-  if( _.process._eventCallbackMap[ event ] )
+{ 
+  let processNamespace = this;
+  for( var eventName in _eventCallbackMap )
+  if( processNamespace._eventCallbackMap[ eventName ] )
   return true;
   return false;
+}
+
+//
+
+let _on = _.process.on;
+function on()
+{  
+  if( arguments.length === 2 )
+  if( _eventCallbackMap[ arguments[ 0 ] ] )
+  {  
+    _.assert( _.routineIs( arguments[ 1 ] ) );
+    arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+  }
+  let o2 = _on.apply( this, arguments );
+  return o2;
+}
+
+on.defaults =
+{
+  callbackMap : null,
 }
 
 // --
@@ -280,6 +329,10 @@ let NamespaceBlueprint =
 }
 
 _.construction.extend( _.process, NamespaceBlueprint );
+
+if( Config.debug )
+_.construction.extend( _.process, { on } );
+
 
 // --
 // export

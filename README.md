@@ -1,6 +1,7 @@
 # wProcessWatcher [![Build Status](https://travis-ci.org/Wandalen/wProcessWatcher.svg?branch=master)](https://travis-ci.org/Wandalen/wProcessWatcher)
 
-Collection of routines to watch child process. Register/unregister handlers for child process start/close. Use the module to monitor creation of child processes and obtain information about command,arguments and options used to create the child process.
+Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.
+
 
 ### Try out
 ```
@@ -14,15 +15,21 @@ node sample/Sample.s
 var _ = require( 'wTools' );
 _.include( 'wProcessWatcher' )
 
-var ChildProcess = require( 'child_process' )
+/* How to change default homedir for new child process by modifying original arguments */
+
+var ChildProcess = require( 'child_process' );
 var args = [ '-e', `"console.log( require( 'os' ).homedir() )"` ]
 var options = { stdio : 'inherit', shell : true };
+
+/* Spawn child process that will print homedir path before using process watcher */
 
 console.log( 'Homedir before arguments patching:' );
 ChildProcess.spawnSync( 'node', args, options, );
 
+/* Enable process watcher and register callback that will be executed before spawning the child process */
+
 function subprocessStartBegin( o )
-{
+{ 
   o.arguments[ 2 ].env = 
   {
     'USERPROFILE' : 'C:\\some\\path',
@@ -33,8 +40,12 @@ function subprocessStartBegin( o )
 _.process.watcherEnable();
 _.process.on( 'subprocessStartBegin', subprocessStartBegin )
 
+/* Spawn child process that will print new homedir path */
+
 console.log( '\nHomedir after arguments patching:' );
 ChildProcess.spawnSync( 'node', args, options );
+
+/* Deregister callback and disable process watcher */
 
 _.process.off( 'subprocessStartBegin', subprocessStartBegin )
 _.process.watcherDisable();
@@ -48,5 +59,4 @@ Homedir after arguments patching:
 C:\some\path
 
 */
-
 ```
