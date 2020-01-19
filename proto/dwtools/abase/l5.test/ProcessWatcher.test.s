@@ -227,7 +227,7 @@ function fork( test )
       'silent' : false,
       'env' : null,
       'stdio' : 'pipe',
-      'execArgv' : [],
+      'execArgv' : process.execArgv,
       'cwd' : process.cwd()
     }
   ]
@@ -606,6 +606,7 @@ function execFileSync( test )
 function watcherDisable( test )
 {
   let subprocessStartBegin = () => {}
+  let subprocessStartBegin2 = () => {}
   
   test.case = 'disabled try to disable again'
   test.mustNotThrowError( () => _.process.watcherDisable() );
@@ -614,11 +615,13 @@ function watcherDisable( test )
   _.process.watcherEnable();
   test.is( _.process.watcherIsEnabled() )
   _.process.on( 'subprocessStartBegin', subprocessStartBegin );
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin2 );
   test.shouldThrowErrorSync( () => _.process.watcherDisable() );
   test.is( _.process.watcherIsEnabled() )
   
   test.case = 'unregister handler then disable watcher'
   _.process.off( 'subprocessStartBegin', subprocessStartBegin );
+  _.process.off( 'subprocessStartBegin', subprocessStartBegin2 );
   _.process.watcherDisable()
   test.is( !_.process.watcherIsEnabled() )
   
@@ -743,6 +746,71 @@ function spawnError( test )
   return ready;
 }
 
+//
+
+function spawnSyncError( test )
+{
+  let self = this;
+
+  let start = _.process.starter({ sync : 1, mode : 'spawn' });
+  let beginCounter = 0;
+  let endCounter = 0;
+  let subprocessStartEndGot,subprocessTerminationEndGot;
+  
+  var expectedArguments = 
+  [
+    'node',
+    [ '-e', 'throw 1' ],
+    {
+      'stdio' : 'pipe',
+      'detached' : false,
+      'cwd' : process.cwd(),
+      'windowsHide' : true
+    }
+  ]
+  
+  let subprocessStartEnd = ( o ) => 
+  { 
+    test.identical( o.arguments, expectedArguments );
+    subprocessStartEndGot = o;
+    beginCounter++
+  }
+  let subprocessTerminationEnd = ( o ) => 
+  { 
+    test.identical( o.arguments, expectedArguments );
+    subprocessTerminationEndGot = o;
+    endCounter++
+  }
+
+  test.identical( beginCounter, 0 );
+  test.identical( endCounter, 0 );
+  
+  _.process.watcherEnable();
+  test.is( _.routineIs( ChildProcess._spawn ) );
+  test.is( _.routineIs( ChildProcess._execFile ) );
+  test.is( _.routineIs( ChildProcess._fork ) );
+  test.is( _.routineIs( ChildProcess._spawnSync ) );
+  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
+  
+  test.shouldThrowErrorSync( () => start( 'node -e "throw 1"' ) );
+  test.identical( beginCounter, 1 );
+  test.identical( endCounter, 1 );
+  
+  _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+  
+  _.process.watcherDisable();
+  test.is( !_.routineIs( ChildProcess._spawn ) );
+  test.is( !_.routineIs( ChildProcess._execFile ) );
+  test.is( !_.routineIs( ChildProcess._fork ) );
+  test.is( !_.routineIs( ChildProcess._spawnSync ) );
+  test.is( !_.routineIs( ChildProcess._execSync ) );
+  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+}
+
 // --
 // test
 // --
@@ -780,7 +848,8 @@ var Proto =
     
     patchHomeDir,
     
-    spawnError
+    spawnError,
+    spawnSyncError
   },
 
 }
