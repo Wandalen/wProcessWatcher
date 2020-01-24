@@ -150,7 +150,7 @@ function watcherEnable()
       let procedures = ChildProcess._namespaces.map( ( wTools ) => 
       { 
         /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
-        return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : o.process */ });
+        return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
       });
 
       _eventHandle( 'subprocessStartEnd', o )
