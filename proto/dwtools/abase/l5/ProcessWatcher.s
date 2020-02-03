@@ -20,18 +20,14 @@ if( typeof module !== 'undefined' )
   _.include( 'wAppBasic' )
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
-
-// if( _realGlobal_ !== _global_ )
-// if( _realGlobal_.wTools && _realGlobal_.wTools.process && _realGlobal_.wTools.process.watcherEnable )
-// return ExportTo( _global_, _realGlobal_ );
-
-_.assert( !!_global_.wTools, 'Does not have wTools' );
-_.assert( _global_.wTools.process === undefined || _global_.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
-
 let ChildProcess;
-let Self = _global_.wTools.process = _global_.wTools.process || Object.create( null );
+let CurrentGlobal = _global_;
+let _ = CurrentGlobal.wTools;
+
+_.assert( !!CurrentGlobal.wTools, 'Does not have wTools' );
+_.assert( CurrentGlobal.wTools.process === undefined || CurrentGlobal.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
+
+let Self = CurrentGlobal.wTools.process = CurrentGlobal.wTools.process || Object.create( null );
 
 //
 
@@ -58,10 +54,17 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
 
 function watcherEnable()
 {
+  let processNamespace = this;
+  
   _.assert( arguments.length === 0 );
   
   if( !ChildProcess  )
   ChildProcess = require( 'child_process' );
+  
+  if( !ChildProcess._namespaces )
+  ChildProcess._namespaces = []
+  
+  _.assert( _.arrayIs( ChildProcess._namespaces ) );
   
   patch( 'spawn' );
   patch( 'fork' );
@@ -70,8 +73,9 @@ function watcherEnable()
   patch( 'execFileSync' );
   patch( 'execSync' );
 
-  _.mapSupplement( Self._eventCallbackMap, _eventCallbackMap );
-
+  _.mapSupplement( processNamespace._eventCallbackMap, _eventCallbackMap );
+  _.arrayAppendOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  
   /* qqq : ?? */
   // _.process.on( 'exit', () =>
   // {
@@ -108,9 +112,11 @@ function watcherEnable()
           process : null,
           sync : 1
         }
-        let procedure = _.procedure.begin({});
-        _eventHandle( 'subprocessStartBegin', o )
-        _eventHandle( 'subprocessStartEnd', o )
+        let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
+        
+        _eventHandle( 'subprocessStartBegin', o );
+        _eventHandle( 'subprocessStartEnd', o );
+        
         try 
         {
           o.returned = original.apply( ChildProcess, arguments );
@@ -120,8 +126,8 @@ function watcherEnable()
           throw err;
         }
         finally
-        {
-          procedure.end();
+        { 
+          procedures.forEach( procedure => procedure.end() )
           _eventHandle( 'subprocessTerminationEnd', o );
         }
         return o.returned;
@@ -133,22 +139,25 @@ function watcherEnable()
         process : null,
         sync : 0
       }
-
-      _eventHandle( 'subprocessStartBegin', o )
+      
+      _eventHandle( 'subprocessStartBegin', o );
 
       o.process = original.apply( ChildProcess, arguments );
 
       if( !_.numberIs( o.process.pid ) )
       return o.process;
-
-      /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
-      let procedure = _.procedure.begin({ _name : 'PID:' + o.process.pid, /* qqq _object : o.process */ }); 
+      
+      let procedures = ChildProcess._namespaces.map( ( wTools ) => 
+      { 
+        /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
+        return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
+      });
 
       _eventHandle( 'subprocessStartEnd', o )
 
       o.process.on( 'close', () =>
       {
-        procedure.end();
+        procedures.forEach( procedure => procedure.end() )
         _eventHandle( 'subprocessTerminationEnd', o );
       });
 
@@ -160,33 +169,26 @@ function watcherEnable()
 
   function _eventHandle( eventName, o )
   { 
-    if( _global_._testerGlobal_.wTools.process )
-    _eventHandleFor( _global_._testerGlobal_.wTools.process )
-    
-    if( _global_._testerGlobal_.wTools.process )
-    _eventHandleFor( _global_.wTools.process )
-    
-    function _eventHandleFor( processNamespace )
-    { 
-      if( !watcherIsEnabled.call( processNamespace ) )
+    ChildProcess._namespaces.forEach( ( wTools ) => 
+    {
+      if( !wTools.process.watcherIsEnabled() )
       return;
-      if( !processNamespace._eventCallbackMap[ eventName ].length )
+      if( !wTools.process._eventCallbackMap[ eventName ].length )
       return;
   
-      let callbacks = processNamespace._eventCallbackMap[ eventName ].slice();
+      let callbacks = wTools.process._eventCallbackMap[ eventName ].slice();
       callbacks.forEach( ( callback ) =>
       {
         try
         {
-          callback.call( processNamespace, o );
+          callback.call( wTools.process, o );
         }
         catch( err )
         {
           throw _.err( `Error in handler::${callback.name} of an event::available of module::ProcessWatcher\n`, err );
         }
       });
-    }
-
+    });
   }
 }
 
@@ -241,17 +243,26 @@ function watcherDisable()
     }
     delete processNamespace._eventCallbackMap[ eventName ];
   })
-
-  if( ChildProcess )
-  {
-    unpatch( 'spawn' );
-    unpatch( 'fork' );
-    unpatch( 'execFile' );
-    unpatch( 'spawnSync' )
-    unpatch( 'execFileSync' )
-    unpatch( 'execSync' )
-    ChildProcess = null;
-  }
+  
+  if( !ChildProcess  )
+  ChildProcess = require( 'child_process' );
+  
+  if( !ChildProcess._namespaces )
+  return true;
+  
+  _.arrayRemoveOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  
+  if( ChildProcess._namespaces.length )
+  return true;
+  
+  unpatch( 'spawn' );
+  unpatch( 'fork' );
+  unpatch( 'execFile' );
+  unpatch( 'spawnSync' )
+  unpatch( 'execFileSync' )
+  unpatch( 'execSync' )
+  
+  delete ChildProcess._namespaces;
 
   return true;
 
@@ -260,7 +271,9 @@ function watcherDisable()
   function unpatch( routine )
   {
     let _routine = _.strPrependOnce( routine, '_' );
-    _.assert( _.routineIs( ChildProcess[ _routine ] ) );
+    _.assert( _.routineIs( ChildProcess[ routine ] ) );
+    if( !_.routineIs( ChildProcess[ _routine ] ) )
+    return;
     ChildProcess[ routine ] = ChildProcess[ _routine ];
     delete ChildProcess[ _routine ];
   }
@@ -279,7 +292,7 @@ function watcherIsEnabled()
 
 //
 
-let _on = _.process.on;
+let _on = Self.on;
 function on()
 {  
   if( arguments.length === 2 )
@@ -296,18 +309,6 @@ on.defaults =
 {
   callbackMap : null,
 }
-
-// --
-// meta
-// --
-
-// function ExportTo( dstGlobal, srcGlobal )
-// {
-//   _.assert( _.mapIs( srcGlobal.wTools.process ) );
-//   _.mapExtend( dstGlobal.wTools, { process : srcGlobal.wTools.process });
-//   if( typeof module !== 'undefined' && module !== null );
-//   module[ 'exports' ] = dstGlobal.wTools.process;
-// }
 
 // --
 // declare
@@ -328,10 +329,10 @@ let NamespaceBlueprint =
   watcherIsEnabled,
 }
 
-_.construction.extend( _.process, NamespaceBlueprint );
+_.construction.extend( Self, NamespaceBlueprint );
 
 if( Config.debug )
-_.construction.extend( _.process, { on } );
+_.construction.extend( Self, { on } );
 
 
 // --

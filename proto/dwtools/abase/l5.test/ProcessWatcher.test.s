@@ -119,12 +119,15 @@ function spawn( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
@@ -195,12 +198,15 @@ function spawnSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node -v' )
   test.identical( got.exitCode, 0 );
@@ -272,12 +278,15 @@ function fork( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
@@ -345,12 +354,15 @@ function exec( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
@@ -431,12 +443,15 @@ function execFile( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
@@ -500,12 +515,15 @@ function execSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node -v' )
   test.identical( got.exitCode, 0 );
@@ -586,12 +604,15 @@ function execFileSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
@@ -609,7 +630,7 @@ function watcherDisable( test )
   let subprocessStartBegin2 = () => {}
   
   test.case = 'disabled try to disable again'
-  test.mustNotThrowError( () => _.process.watcherDisable() );
+  test.mustNotThrowError( () => { debugger;_.process.watcherDisable() });
   
   test.case = 'disable with handler registered'
   _.process.watcherEnable();
@@ -733,12 +754,15 @@ function spawnError( test )
     
     _.process.watcherDisable();
     
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    if( !ChildProcess._namespaces )
+    {
+      test.is( !_.routineIs( ChildProcess._spawn ) );
+      test.is( !_.routineIs( ChildProcess._execFile ) );
+      test.is( !_.routineIs( ChildProcess._fork ) );
+      test.is( !_.routineIs( ChildProcess._spawnSync ) );
+      test.is( !_.routineIs( ChildProcess._execSync ) );
+      test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    }
     
     return null;
   })
@@ -803,12 +827,15 @@ function spawnSyncError( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
   
   _.process.watcherDisable();
-  test.is( !_.routineIs( ChildProcess._spawn ) );
-  test.is( !_.routineIs( ChildProcess._execFile ) );
-  test.is( !_.routineIs( ChildProcess._fork ) );
-  test.is( !_.routineIs( ChildProcess._spawnSync ) );
-  test.is( !_.routineIs( ChildProcess._execSync ) );
-  test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  if( !ChildProcess._namespaces )
+  {
+    test.is( !_.routineIs( ChildProcess._spawn ) );
+    test.is( !_.routineIs( ChildProcess._execFile ) );
+    test.is( !_.routineIs( ChildProcess._fork ) );
+    test.is( !_.routineIs( ChildProcess._spawnSync ) );
+    test.is( !_.routineIs( ChildProcess._execSync ) );
+    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+  }
 }
 
 // --
