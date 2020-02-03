@@ -58,7 +58,7 @@ let Self = _global_.wTools.process = _global_.wTools.process || Object.create( n
 
 function watcherEnable()
 {
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   
   if( !ChildProcess  )
   ChildProcess = require( 'child_process' );
