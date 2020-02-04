@@ -1,51 +1,35 @@
 {
-  "name": "wprocesswatcher",
-  "version": "0.3.216",
-  "description": "Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.",
-  "license": "MIT",
-  "author": "Kostiantyn Wandalen <wanalen@willbe.so>",
-  "enabled": 1,
-  "contributors": [
-    {
-      "name": "Kostiantyn Wandalen",
-      "email": "wanalen@willbe.so"
-    },
-    {
-      "name": "Volodymyr M.",
-      "email": "volodymyr.migdal@gmail.com"
-    }
-  ],
-  "main": "proto/dwtools/abase/l5/ProcessWatcher.s",
-  "files": [
-    "proto/dwtools/abase/l5",
-    "proto/dwtools/Tools.s",
-    "out"
-  ],
-  "scripts": {
-    "test": "wtest .run proto/**",
-    "docgen": "wdocgen proto"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wandalen/wProcessWatcher.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Wandalen/wProcessWatcher/issues"
-  },
-  "dependencies": {
-    "wTools": "alpha",
-    "wProto": "alpha",
-    "wCopyable": "alpha",
-    "wprocedure": "alpha",
-    "wappbasic": "alpha"
-  },
-  "devDependencies": {
-    "wTesting": "alpha",
-    "wappbasic": "alpha"
-  },
-  "keywords": [
-    "wTools",
-    "watch",
-    "child process"
-  ]
+  "name" : "wprocesswatcher", 
+  "version" : "0.3.219", 
+  "description" : "Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.", 
+  "license" : "MIT", 
+  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
+  "enabled" : 1, 
+  "contributors" : 
+  [
+    { "name" : "Kostiantyn Wandalen", "email" : "wanalen@willbe.so" }, 
+    { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }
+  ], 
+  "main" : "proto/dwtools/abase/l5/ProcessWatcher.s", 
+  "files" : [ "proto/dwtools/abase/l5", "proto/dwtools/Tools.s", "out" ], 
+  "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" }, 
+  "repository" : 
+  {
+    "type" : "git", 
+    "url" : "https://github.com/Wandalen/wProcessWatcher.git"
+  }, 
+  "bugs" : 
+  {
+    "url" : "https://github.com/Wandalen/wProcessWatcher/issues"
+  }, 
+  "dependencies" : 
+  {
+    "wTools" : "alpha", 
+    "wProto" : "alpha", 
+    "wCopyable" : "alpha", 
+    "wprocedure" : "alpha", 
+    "wappbasic" : "alpha"
+  }, 
+  "devDependencies" : { "wTesting" : "alpha", "wappbasic" : "alpha" }, 
+  "keywords" : [ "wTools", "watch", "child process" ]
 }
