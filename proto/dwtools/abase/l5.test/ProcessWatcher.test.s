@@ -39,7 +39,6 @@ function suiteBegin()
 function suiteEnd()
 {
   var self = this;
-
   _.assert( _.strHas( self.suitePath, '/ProcessWatcher-' ) )
   _.path.pathDirTempClose( self.suitePath );
 }
