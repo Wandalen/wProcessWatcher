@@ -72,7 +72,7 @@ function watcherEnable()
   patch( 'execFileSync' );
   patch( 'execSync' );
 
-  _.mapSupplement( processNamespace._eventCallbackMap, _eventCallbackMap );
+  _.mapSupplement( processNamespace._ehandler.events, Events );
   _.arrayAppendOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
 
   /* qqq : ?? */
@@ -172,10 +172,10 @@ function watcherEnable()
     {
       if( !wTools.process.watcherIsEnabled() )
       return;
-      if( !wTools.process._eventCallbackMap[ eventName ].length )
+      if( !wTools.process._ehandler.events[ eventName ].length )
       return;
 
-      let callbacks = wTools.process._eventCallbackMap[ eventName ].slice();
+      let callbacks = wTools.process._ehandler.events[ eventName ].slice();
       callbacks.forEach( ( callback ) =>
       {
         try
@@ -213,9 +213,9 @@ function watcherEnable()
 function watcherDisable()
 {
   let processNamespace = this;
-  _.each( _eventCallbackMap, ( handlers, eventName ) =>
+  _.each( Events, ( handlers, eventName ) =>
   {
-    if( !processNamespace._eventCallbackMap[ eventName ] )
+    if( !processNamespace._ehandler.events[ eventName ] )
     return;
     if( handlers.length )
     {
@@ -240,7 +240,7 @@ function watcherDisable()
       // qqq : bad naming. not "event"
       ///qqq Vova: done
     }
-    delete processNamespace._eventCallbackMap[ eventName ];
+    delete processNamespace._ehandler.events[ eventName ];
   })
 
   if( !ChildProcess  )
@@ -283,8 +283,8 @@ function watcherDisable()
 function watcherIsEnabled()
 {
   let processNamespace = this;
-  for( var eventName in _eventCallbackMap )
-  if( processNamespace._eventCallbackMap[ eventName ] )
+  for( var eventName in Events )
+  if( processNamespace._ehandler.events[ eventName ] )
   return true;
   return false;
 }
@@ -295,7 +295,7 @@ let _on = Self.on;
 function on()
 {
   if( arguments.length === 2 )
-  if( _eventCallbackMap[ arguments[ 0 ] ] )
+  if( Events[ arguments[ 0 ] ] )
   {
     _.assert( _.routineIs( arguments[ 1 ] ) );
     arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
@@ -313,7 +313,7 @@ on.defaults =
 // declare
 // --
 
-let _eventCallbackMap =
+let Events =
 {
   subprocessStartBegin  : [],
   subprocessStartEnd  : [],
