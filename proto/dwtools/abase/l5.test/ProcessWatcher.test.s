@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../Tools.s' );
+  let _ = require( '../../../dwtools/Tools.s' );
 
   require( '../l5/ProcessWatcher.s' );
 
@@ -30,7 +30,7 @@ function suiteBegin()
 {
   var self = this;
   self.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
-  self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../Tools.s' ) );
+  self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../dwtools/Tools.s' ) );
   self.toolsPathInclude = `var _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
 }
 
