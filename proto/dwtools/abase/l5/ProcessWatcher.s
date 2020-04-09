@@ -49,7 +49,8 @@ let Self = CurrentGlobal.wTools.process = CurrentGlobal.wTools.process || Object
  * @return {Object} Returns ProcessWatcher instance.
  *
  * @function watcherEnable
- * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
+ * @namespace wTools.process
+ * @module Tools/base/ProcessWatcher
  */
 
 function watcherEnable()
@@ -207,7 +208,8 @@ function watcherEnable()
  * @return {Object} Returns ProcessWatcher instance.
  *
  * @function watcherEnable
- * @memberof module:Tools/base/ProcessWatcher.Tools( module::ProcessWatcher )
+ * @namespace wTools.process
+ * @module Tools/base/ProcessWatcher
  */
 
 function watcherDisable()
