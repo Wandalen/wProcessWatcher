@@ -1,6 +1,6 @@
 {
   "name" : "wprocesswatcher",
-  "version" : "0.3.255",
+  "version" : "0.3.256",
   "description" : "Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.",
   "license" : "MIT",
   "author" : "Kostiantyn Wandalen <wanalen@willbe.so>",
@@ -24,12 +24,12 @@
   },
   "dependencies" :
   {
-    "wTools" : "alpha",
-    "wProto" : "alpha",
-    "wCopyable" : "alpha",
-    "wprocedure" : "alpha",
-    "wappbasic" : "alpha"
+    "wTools" : "gamma",
+    "wProto" : "gamma",
+    "wCopyable" : "gamma",
+    "wprocedure" : "gamma",
+    "wappbasic" : "gamma"
   },
-  "devDependencies" : { "wTesting" : "alpha", "wappbasic" : "alpha" },
+  "devDependencies" : { "wTesting" : "gamma", "wappbasic" : "gamma" },
   "keywords" : [ "wTools", "watch", "child process" ]
 }
