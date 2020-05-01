@@ -389,7 +389,7 @@ function execFile( test )
       ready.take( result )
     })
     childProcess.on( 'error', ( err ) => ready.error( err ) )
-    ready.deasyncWait();
+    ready.deasync();
     return ready.sync();
   }
   let beginCounter = 0;
