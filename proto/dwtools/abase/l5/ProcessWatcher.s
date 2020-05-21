@@ -343,7 +343,7 @@ _.construction.extend( Self, { on } );
 // if( _realGlobal_ !== _global_ )
 // return ExportTo( _realGlobal_, _global_ );
 
-if( typeof module !== 'undefined' && module !== null )
+if( typeof module !== 'undefined' )
 module[ 'exports' ] = _.process;
 
 })();
