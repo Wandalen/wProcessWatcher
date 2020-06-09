@@ -28,8 +28,8 @@
     "wProto" : "alpha",
     "wCopyable" : "alpha",
     "wprocedure" : "alpha",
-    "wappbasic" : "alpha"
+    "wprocess" : "alpha"
   },
-  "devDependencies" : { "wTesting" : "alpha", "wappbasic" : "alpha" },
+  "devDependencies" : { "wTesting" : "alpha", "wprocess" : "alpha" },
   "keywords" : [ "wTools", "watch", "child process" ]
 }

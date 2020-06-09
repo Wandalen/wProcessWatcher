@@ -11,7 +11,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
   _.include( 'wFiles' );
-  _.include( 'wAppBasic' );
+  _.include( 'wProcess' );
 
   var ChildProcess = require( 'child_process' );
 

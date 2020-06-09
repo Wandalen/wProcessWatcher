@@ -186,8 +186,8 @@ module:
         path: 'npm:///wprocedure'
         autoExporting: 0
         enabled: 0
-      wAppBasic:
-        path: 'npm:///wappbasic'
+      wProcess:
+        path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
       wProcessWatcher:
@@ -1002,8 +1002,8 @@ module:
         path: 'npm:///wprocedure'
         autoExporting: 0
         enabled: 0
-      wAppBasic:
-        path: 'npm:///wappbasic'
+      wProcess:
+        path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
       wProcessWatcher:
