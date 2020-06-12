@@ -29,7 +29,7 @@ var Self = {};
 function suiteBegin()
 {
   var self = this;
-  self.suitePath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
+  self.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
   self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../dwtools/Tools.s' ) );
   self.toolsPathInclude = `var _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
 }
@@ -39,8 +39,8 @@ function suiteBegin()
 function suiteEnd()
 {
   var self = this;
-  _.assert( _.strHas( self.suitePath, '/ProcessWatcher-' ) )
-  _.path.pathDirTempClose( self.suitePath );
+  _.assert( _.strHas( self.suiteTempPath, '/ProcessWatcher-' ) )
+  _.path.pathDirTempClose( self.suiteTempPath );
 }
 
 function isRunning( pid )
@@ -853,7 +853,7 @@ var Proto =
 
   context :
   {
-    suitePath : null,
+    suiteTempPath : null,
     toolsPath : null,
     toolsPathInclude : null,
     isRunning
