@@ -3,8 +3,8 @@ root:
   - wProcessWatcher.out
 consistency:
   ../.ex.will.yml: &ref_0
-    hash: e28a70a961d80d5e1652107b858a0bb1
-    size: 2112
+    hash: f0bd4ceef5f828f9310485a1077674a3
+    size: 2113
   ../.im.will.yml: &ref_1
     hash: 1c9bfb2a2f348bb5e76ac785f79a9726
     size: 5228
@@ -1488,8 +1488,8 @@ module:
           - 'build::npm'
     consistency:
       ../.ex.will.yml:
-        hash: e28a70a961d80d5e1652107b858a0bb1
-        size: 2112
+        hash: f0bd4ceef5f828f9310485a1077674a3
+        size: 2113
       ../.im.will.yml:
         hash: 1c9bfb2a2f348bb5e76ac785f79a9726
         size: 5228
