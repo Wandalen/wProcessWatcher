@@ -29,7 +29,7 @@ var Self = {};
 function suiteBegin()
 {
   var self = this;
-  self.suiteTempPath = _.path.pathDirTempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
+  self.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
   self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../dwtools/Tools.s' ) );
   self.toolsPathInclude = `var _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
 }
@@ -40,7 +40,7 @@ function suiteEnd()
 {
   var self = this;
   _.assert( _.strHas( self.suiteTempPath, '/ProcessWatcher-' ) )
-  _.path.pathDirTempClose( self.suiteTempPath );
+  _.path.tempClose( self.suiteTempPath );
 }
 
 function isRunning( pid )
