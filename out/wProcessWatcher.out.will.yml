@@ -162,6 +162,7 @@ module:
           export: 1
         path:
           - ../proto
+          - ../proto/Integration.test.s
           - ../proto/dwtools
           - ../proto/dwtools/Tools.s
           - ../proto/dwtools/abase
@@ -1525,6 +1526,4 @@ module:
       ../.im.will.yml:
         hash: 1c9bfb2a2f348bb5e76ac785f79a9726
         size: 5228
-      wProcessWatcher.out.will.yml:
-        hash: 679dd4756690739e7511d88f5f525bec
-        size: 39165
+      wProcessWatcher.out.will.yml: *ref_0
