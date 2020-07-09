@@ -10,8 +10,8 @@
     { "name" : "Kostiantyn Wandalen", "email" : "wanalen@01.school" },
     { "name" : "Volodymyr M.", "email" : "volodymyr.migdal@gmail.com" }
   ],
-  "main" : "proto/dwtools/abase/l5/ProcessWatcher.s",
-  "files" : [ "proto/dwtools/abase/l5", "proto/dwtools/Tools.s", "out" ],
+  "main" : "proto/wtools/abase/l5/ProcessWatcher.s",
+  "files" : [ "proto/wtools/abase/l5", "proto/wtools/Tools.s", "out" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
   "repository" :
   {

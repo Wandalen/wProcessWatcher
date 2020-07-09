@@ -1,4 +1,4 @@
-# module::ProcessWatcher [![Status](https://github.com/Wandalen/wProcessWatcher/workflows/Test/badge.svg)](https://github.com/Wandalen/wProcessWatcher}/actions?query=workflow%3ATest)
+# module::ProcessWatcher [![Status](https://github.com/Wandalen/wProcessWatcher/workflows/Test/badge.svg)](https://github.com/Wandalen/wProcessWatcher/actions?query=workflow%3ATest) [![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
 
 Collection of routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.
 
