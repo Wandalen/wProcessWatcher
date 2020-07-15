@@ -6,7 +6,7 @@ Collection of routines for child process monitoring. Allows to keep track of cre
 ### Try out
 ```
 npm install
-node sample/Sample.js
+node sample/Sample.s
 ```
 
 ##### Example
