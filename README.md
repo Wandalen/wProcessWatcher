@@ -12,7 +12,7 @@ node sample/Sample.s
 ##### Example
 
 ```javascript
-var _ = require( 'wTools' );
+let _ = require( 'wTools' );
 _.include( 'wProcessWatcher' )
 
 /* How to change default homedir for new child process by modifying original arguments */

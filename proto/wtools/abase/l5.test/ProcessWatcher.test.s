@@ -18,9 +18,9 @@ if( typeof module !== 'undefined' )
 }
 
 
-var _global = _global_;
-var _ = _global_.wTools;
-var Self = {};
+let _global = _global_;
+let _ = _global_.wTools;
+let Self = {};
 
 // --
 // context
@@ -31,7 +31,7 @@ function suiteBegin()
   var self = this;
   self.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
   self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../wtools/Tools.s' ) );
-  self.toolsPathInclude = `var _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
+  self.toolsPathInclude = `let _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
 }
 
 //
