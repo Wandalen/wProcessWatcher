@@ -844,7 +844,7 @@ function spawnSyncError( test )
 var Proto =
 {
 
-  name : 'Tools.base.l5.ProcessWatcher',
+  name : 'Tools.l5.ProcessWatcher',
   silencing : 1,
   routineTimeOut : 60000,
   onSuiteBegin : suiteBegin,
