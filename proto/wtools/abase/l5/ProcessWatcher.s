@@ -8,8 +8,7 @@
  */
 
 /**
- * @file ProcessWatcher.s.
- */
+ *  */
 
 if( typeof module !== 'undefined' )
 {
