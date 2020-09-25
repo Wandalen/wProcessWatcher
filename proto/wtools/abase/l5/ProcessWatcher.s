@@ -111,7 +111,7 @@ function watcherEnable()
           process : null,
           sync : 1
         }
-        let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
+        // let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
 
         _eventHandle( 'subprocessStartBegin', o );
         _eventHandle( 'subprocessStartEnd', o );
@@ -126,7 +126,7 @@ function watcherEnable()
         }
         finally
         {
-          procedures.forEach( procedure => procedure.end() )
+          // procedures.forEach( procedure => procedure.end() )
           _eventHandle( 'subprocessTerminationEnd', o );
         }
         return o.returned;
@@ -146,17 +146,17 @@ function watcherEnable()
       if( !_.numberIs( o.process.pid ) )
       return o.process;
 
-      let procedures = ChildProcess._namespaces.map( ( wTools ) =>
-      {
-        /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
-        return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
-      });
+      // let procedures = ChildProcess._namespaces.map( ( wTools ) =>
+      // {
+      //   /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
+      //   return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
+      // });
 
       _eventHandle( 'subprocessStartEnd', o )
 
       o.process.on( 'close', () =>
       {
-        procedures.forEach( procedure => procedure.end() )
+        // procedures.forEach( procedure => procedure.end() )
         _eventHandle( 'subprocessTerminationEnd', o );
       });
 
@@ -235,7 +235,7 @@ function watcherDisable()
         errMsg = `Event ${eventName} has ${handlers.length} registered handlers.`;
       }
 
-      throw _.err( errMsg + '\nPlease use _.process.off to unregister handlers.' );
+      throw _.err( errMsg + `\nPlease use _.process.off to unregister handlers.` );
       // qqq : use ` instead
       // qqq : not enough information!
       // qqq : bad naming. not "event"
