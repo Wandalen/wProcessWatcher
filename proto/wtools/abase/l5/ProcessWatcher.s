@@ -159,23 +159,6 @@ function watcherEnable()
         _eventHandle( 'subprocessTerminationEnd', o );
       });
 
-      /*
-        Handles disconnection of child process from parent.
-        The 'close' event is not fired if child was disconnected.
-        Using the 'disconnect' event is less optimal because it can be fired in several cases.
-        There is no problem with 'close' event if child disconnects itself.
-      */
-
-      if( o.process.disconnect )
-      {
-        let originalDisconnect = o.process.disconnect;
-        o.process.disconnect = function disconnect()
-        {
-          originalDisconnect.apply( o.process, arguments );
-          _eventHandle( 'subprocessTerminationEnd', o );
-        }
-      }
-
       //
 
       return o.process;
