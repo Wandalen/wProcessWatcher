@@ -229,7 +229,8 @@ function fork( test )
     '-v',
     [],
     {
-      'silent' : false,
+      'detached' : false,
+      // 'silent' : false,
       'env' : null,
       'stdio' : 'pipe',
       'execArgv' : process.execArgv,
@@ -653,8 +654,13 @@ function patchHomeDir( test )
 {
   let self = this;
 
-  let start = _.process.starter({ mode : 'spawn', outputCollecting : 1 });
-  let homedirPath = _.path.nativize( '/D/tmp.tmp' );
+  let start = _.process.starter
+  ({
+    execPath : process.argv[ 0 ],
+    mode : 'spawn',
+    outputCollecting : 1
+  });
+  let homedirPath = _.path.nativize( self.suiteTempPath );
 
   let onPatch = ( o ) =>
   {
@@ -670,7 +676,7 @@ function patchHomeDir( test )
   _.process.on( 'subprocessStartBegin', onPatch )
 
 
-  return start( `node -e "console.log( require('os').homedir() )"` )
+  return start({ args : [ '-e', `console.log( require('os').homedir() )` ] })
   .then( ( got ) =>
   {
     test.identical( got.exitCode, 0 );
@@ -864,9 +870,9 @@ var Proto =
     spawn,
     spawnSync,
     fork,
-    exec,
+    // exec,
     execFile,
-    execSync,
+    // execSync,
 
     execFileSync,
 
