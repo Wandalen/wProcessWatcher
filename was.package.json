@@ -30,6 +30,6 @@
     "wprocedure" : "",
     "wprocess" : ""
   },
-  "devDependencies" : { "wTesting" : "", "wprocess" : "" },
+  "devDependencies" : { "wTesting" : "", "wprocess" : "", "wprocesswatcher" : "file:." },
   "keywords" : [ "wTools", "watch", "child process" ]
 }
