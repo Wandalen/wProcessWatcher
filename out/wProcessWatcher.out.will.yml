@@ -2,13 +2,10 @@ format: outwillfile-2.0
 root:
   - wProcessWatcher.out
 consistency:
-  wProcessWatcher.out.will.yml: &ref_0
-    hash: 3b6d42354b663e093826a7edaf7d55bb
-    size: 39338
-  ../.ex.will.yml: &ref_1
-    hash: f0bd4ceef5f828f9310485a1077674a3
-    size: 2113
-  ../.im.will.yml: &ref_2
+  ../.ex.will.yml: &ref_0
+    hash: 114dddc4824709a38b7b18501f7f15f8
+    size: 2128
+  ../.im.will.yml: &ref_1
     hash: 9fd0d099e6a3ed529085bcb5aaddaf98
     size: 5225
 module:
@@ -17,28 +14,29 @@ module:
       name: wProcessWatcher
       org: noorg
       description: >-
-        Collection of cross-platform routines for child process monitoring. Allows to keep
-        track of creation, spawn and termination of a child process via events.
-        Get information about command, arguments and options used to create a
-        child process. Modify command, arguments or options on the creation
-        stage. Access instance of ChildProcess on spawn and termination stages.
+        Collection of cross-platform routines for child process monitoring.
+        Allows to keep track of creation, spawn and termination of a child
+        process via events. Get information about command, arguments and options
+        used to create a child process. Modify command, arguments or options on
+        the creation stage. Access instance of ChildProcess on spawn and
+        termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - watch
         - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -710,24 +708,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -816,38 +796,28 @@ module:
           content: proto
           export: 1
     consistency:
-      wProcessWatcher.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wProcessWatcher
       org: noorg
       description: >-
-        Collection of cross-platform routines for child process monitoring. Allows to keep
-        track of creation, spawn and termination of a child process via events.
-        Get information about command, arguments and options used to create a
-        child process. Modify command, arguments or options on the creation
-        stage. Access instance of ChildProcess on spawn and termination stages.
+        Collection of cross-platform routines for child process monitoring.
+        Allows to keep track of creation, spawn and termination of a child
+        process via events. Get information about command, arguments and options
+        used to create a child process. Modify command, arguments or options on
+        the creation stage. Access instance of ChildProcess on spawn and
+        termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - watch
-        - child process
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
+      contributors: *ref_4
       npm.name: wprocesswatcher
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -1521,9 +1491,8 @@ module:
           - 'build::npm'
     consistency:
       ../.ex.will.yml:
-        hash: f0bd4ceef5f828f9310485a1077674a3
-        size: 2113
+        hash: 114dddc4824709a38b7b18501f7f15f8
+        size: 2128
       ../.im.will.yml:
         hash: 9fd0d099e6a3ed529085bcb5aaddaf98
         size: 5225
-      wProcessWatcher.out.will.yml: *ref_0
