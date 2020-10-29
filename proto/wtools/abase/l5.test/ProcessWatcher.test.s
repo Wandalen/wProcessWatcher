@@ -43,6 +43,37 @@ function suiteEnd()
   _.path.tempClose( self.suiteTempPath );
 }
 
+function assetFor( test, name )
+{
+  let context = this;
+  let a = test.assetFor( name );
+
+  _.assert( _.routineIs( a.program.head ) );
+  _.assert( _.routineIs( a.program.body ) );
+
+  let oprogram = a.program;
+  program_body.defaults = a.program.defaults;
+  a.program = _.routineUnite( a.program.head, program_body );
+  return a;
+
+  /* */
+
+  function program_body( o )
+  {
+    let locals =
+    {
+      context : { t0 : context.t0, t1 : context.t1, t2 : context.t2, t3 : context.t3 },
+      toolsPath : _.module.resolve( 'wTools' ),
+    };
+    o.locals = o.locals || locals;
+    _.mapSupplement( o.locals, locals );
+    _.mapSupplement( o.locals.context, locals.context );
+    let programPath = a.path.nativize( oprogram.body.call( a, o ) );
+    return programPath;
+  }
+
+}
+
 function isRunning( pid )
 {
   try
@@ -71,7 +102,7 @@ function spawn( test )
     'node',
     [ '-v' ],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -152,7 +183,7 @@ function spawnSync( test )
     'node',
     [ '-v' ],
     {
-      'stdio' : 'pipe',
+      'stdio' :  [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -232,7 +263,7 @@ function fork( test )
       'detached' : false,
       // 'silent' : false,
       'env' : null,
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
       'execArgv' : process.execArgv,
       'cwd' : process.cwd()
     }
@@ -703,7 +734,7 @@ function spawnError( test )
     'nnooddee',
     [],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -791,7 +822,7 @@ function spawnSyncError( test )
     'node',
     [ '-e', 'throw 1' ],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -843,6 +874,104 @@ function spawnSyncError( test )
   }
 }
 
+//
+
+function detached( test )
+{
+  let context = this;
+  let a = context.assetFor( test, null );
+  
+  let testAppPath = a.path.nativize( a.program( testApp ) );
+
+  let startBegin = 0;
+  let startEnd = 0;
+  let endCounter = 0;
+  let descriptor = null;
+
+  let subprocessStartBegin = ( o ) =>
+  {
+    startBegin++
+  }
+
+  let subprocessStartEnd = ( o ) =>
+  {
+    startEnd++
+  }
+  let subprocessTerminationEnd = ( o ) =>
+  {
+    descriptor = o;
+    endCounter++
+  }
+
+  test.identical( startBegin, 0 );
+  test.identical( startEnd, 0 );
+  test.identical( endCounter, 0 );
+
+  _.process.watcherEnable();
+
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin )
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+  let o = 
+  { 
+    execPath : 'node ' + testAppPath,
+    mode : 'spawn', 
+    detaching : 1, 
+    stdio : 'pipe', 
+    outputPiping : 1 
+  }
+  
+  _.process.start( o );
+  
+  o.conStart.thenGive( () => o.disconnect() )
+  
+  let ready = _.time.out( context.t2 * 5 );
+
+  ready.then( () =>
+  {
+    test.is( !_.process.isAlive( o.process.pid ) );
+    test.identical( startBegin, 1 );
+    test.identical( startEnd, 1 );
+    test.identical( endCounter, 1 );
+    
+    test.identical( descriptor.terminated, true );
+    test.identical( descriptor.terminationEvent, 'exit' );
+
+    _.process.off( 'subprocessStartBegin', subprocessStartBegin )
+    _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+    _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+    _.process.watcherDisable();
+    
+    return null;
+  })
+  
+  /* */
+
+  return ready;
+  
+  function testApp()
+  {
+    let _ = require( toolsPath );
+    _.include( 'wProcess' );
+    _.include( 'wFiles' );
+    console.log( 'Child process start', process.pid )
+    _.time.out( context.t2 * 3, () =>
+    {
+      let filePath = _.path.join( __dirname, 'testFile' );
+      _.fileProvider.fileWrite( filePath, _.toStr( process.pid ) );
+      console.log( 'Child process end' )
+      return null;
+    })
+  }
+}
+
+detached.description = 
+`
+Checks that termination of detached and disconnected child process works
+`
+
 // --
 // test
 // --
@@ -862,7 +991,12 @@ var Proto =
     suiteTempPath : null,
     toolsPath : null,
     toolsPathInclude : null,
-    isRunning
+    t0 : 100,
+    t1 : 1000,
+    t2 : 5000,
+    t3 : 15000,
+    isRunning,
+    assetFor,
   },
 
   tests :
@@ -881,7 +1015,9 @@ var Proto =
     patchHomeDir,
 
     spawnError,
-    spawnSyncError
+    spawnSyncError,
+    
+    detached
   },
 
 }
