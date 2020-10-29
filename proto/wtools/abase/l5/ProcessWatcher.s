@@ -109,7 +109,8 @@ function watcherEnable()
         {
           arguments : Array.prototype.slice.call( arguments ),
           process : null,
-          sync : 1
+          sync : 1,
+          terminated : false
         }
         // let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
 
@@ -127,7 +128,8 @@ function watcherEnable()
         finally
         {
           // procedures.forEach( procedure => procedure.end() )
-          _eventHandle( 'subprocessTerminationEnd', o );
+          _eventHandleTerminationEnd( o );
+          
         }
         return o.returned;
       }
@@ -137,7 +139,8 @@ function watcherEnable()
         arguments : Array.prototype.slice.call( arguments ),
         process : null,
         sync : 0,
-        ended : false
+        terminated : false,
+        terminationEvent : null
       }
 
       _eventHandle( 'subprocessStartBegin', o );
@@ -155,16 +158,23 @@ function watcherEnable()
 
       _eventHandle( 'subprocessStartEnd', o )
 
+      /* Uses exit event to handle termination of disconnected and detached process */
+      
       o.process.on( 'exit', () =>
       { 
+        /* 
+          Give a chance for 'close' event to emit 'subprocessTerminationEnd'
+        */
         setTimeout( () => 
         {
+          o.terminationEvent = 'exit';
           _eventHandleTerminationEnd( o );
         }, 100 )
       });
       
       o.process.on( 'close', () =>
       { 
+        o.terminationEvent = 'close';
         _eventHandleTerminationEnd( o );
       });
 
@@ -204,9 +214,9 @@ function watcherEnable()
   
   function _eventHandleTerminationEnd( o )
   {
-    if( o.ended )
+    if( o.terminated )
     return;
-    o.ended = true;
+    o.terminated = true;
     _eventHandle( 'subprocessTerminationEnd', o );
   }
 }
