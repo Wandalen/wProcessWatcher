@@ -136,7 +136,8 @@ function watcherEnable()
       {
         arguments : Array.prototype.slice.call( arguments ),
         process : null,
-        sync : 0
+        sync : 0,
+        ended : false
       }
 
       _eventHandle( 'subprocessStartBegin', o );
@@ -154,9 +155,17 @@ function watcherEnable()
 
       _eventHandle( 'subprocessStartEnd', o )
 
+      o.process.on( 'exit', () =>
+      { 
+        setTimeout( () => 
+        {
+          _eventHandleTerminationEnd( o );
+        }, 100 )
+      });
+      
       o.process.on( 'close', () =>
-      {
-        _eventHandle( 'subprocessTerminationEnd', o );
+      { 
+        _eventHandleTerminationEnd( o );
       });
 
       //
@@ -189,6 +198,16 @@ function watcherEnable()
         }
       });
     });
+  }
+  
+  /* */
+  
+  function _eventHandleTerminationEnd( o )
+  {
+    if( o.ended )
+    return;
+    o.ended = true;
+    _eventHandle( 'subprocessTerminationEnd', o );
   }
 }
 
