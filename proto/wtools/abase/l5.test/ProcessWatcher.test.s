@@ -71,7 +71,7 @@ function spawn( test )
     'node',
     [ '-v' ],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -152,7 +152,7 @@ function spawnSync( test )
     'node',
     [ '-v' ],
     {
-      'stdio' : 'pipe',
+      'stdio' :  [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -232,7 +232,7 @@ function fork( test )
       'detached' : false,
       // 'silent' : false,
       'env' : null,
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
       'execArgv' : process.execArgv,
       'cwd' : process.cwd()
     }
@@ -703,7 +703,7 @@ function spawnError( test )
     'nnooddee',
     [],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
@@ -791,7 +791,7 @@ function spawnSyncError( test )
     'node',
     [ '-e', 'throw 1' ],
     {
-      'stdio' : 'pipe',
+      'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
       'cwd' : process.cwd(),
       'windowsHide' : true
