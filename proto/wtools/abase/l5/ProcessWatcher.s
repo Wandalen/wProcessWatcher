@@ -175,7 +175,6 @@ function watcherEnable()
       return;
       if( !wTools.process._ehandler.events[ eventName ].length )
       return;
-
       let callbacks = wTools.process._ehandler.events[ eventName ].slice();
       callbacks.forEach( ( callback ) =>
       {
@@ -190,6 +189,7 @@ function watcherEnable()
       });
     });
   }
+
 }
 
 //
