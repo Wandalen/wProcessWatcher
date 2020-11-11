@@ -1,6 +1,9 @@
-( function _ProcessWatcher_test_s( ) {
+( function _ProcessWatcher_test_s( )
+{
 
 'use strict';
+
+let ChildProcess;
 
 if( typeof module !== 'undefined' )
 {
@@ -13,7 +16,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wFiles' );
   _.include( 'wProcess' );
 
-  var ChildProcess = require( 'child_process' );
+  ChildProcess = require( 'child_process' );
 
 }
 
@@ -80,7 +83,7 @@ function isRunning( pid )
   {
     return process.kill( pid, 0 );
   }
-  catch (e)
+  catch( e )
   {
     return e.code === 'EPERM'
   }
@@ -95,7 +98,7 @@ function spawn( test )
   let start = _.process.starter({ deasync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -108,7 +111,7 @@ function spawn( test )
       'windowsHide' : true
     }
   ]
-  
+
   if( process.platform !== 'win32' )
   {
     expectedArguments[ 2 ].uid = null;
@@ -182,7 +185,7 @@ function spawnSync( test )
   let start = _.process.starter({ deasync : 0, sync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -195,7 +198,7 @@ function spawnSync( test )
       'windowsHide' : true
     }
   ]
-  
+
   if( process.platform !== 'win32' )
   {
     expectedArguments[ 2 ].uid = null;
@@ -265,7 +268,7 @@ function fork( test )
   let start = _.process.starter({ deasync : 1, mode : 'fork' });
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -280,7 +283,7 @@ function fork( test )
       'cwd' : process.cwd()
     }
   ]
-  
+
   if( process.platform !== 'win32' )
   {
     expectedArguments[ 2 ].uid = null;
@@ -354,7 +357,7 @@ function exec( test )
   let start = _.process.starter({ deasync : 1, mode : 'exec' });
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -427,7 +430,7 @@ function execFile( test )
 {
   let self = this;
 
-  let start = function execFile( exec, args )
+  function start( exec, args )
   {
     let ready = new _.Consequence();
     var childProcess = ChildProcess.execFile( exec, args );
@@ -444,7 +447,7 @@ function execFile( test )
   }
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -586,7 +589,7 @@ function execFileSync( test )
 {
   let self = this;
 
-  let start = function execFileSync( exec, args )
+  function start( exec, args )
   {
     var result = Object.create( null );
     try
@@ -594,7 +597,7 @@ function execFileSync( test )
       result.process = ChildProcess.execFileSync( exec, args );
       result.exitCode = 0;
     }
-    catch ( err )
+    catch( err )
     {
       result.process = err;
       result.exitCode = result.process.status;
@@ -603,7 +606,7 @@ function execFileSync( test )
   }
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -714,7 +717,7 @@ function patchHomeDir( test )
   let onPatch = ( o ) =>
   {
     o.arguments[ 2 ].env = Object.create( null );
-    if( process.platform == 'win32' )
+    if( process.platform === 'win32' )
     o.arguments[ 2 ].env[ 'USERPROFILE' ] = homedirPath
     else
     o.arguments[ 2 ].env[ 'HOME' ] = homedirPath
@@ -758,7 +761,7 @@ function spawnError( test )
       'windowsHide' : true
     }
   ]
-  
+
   if( process.platform !== 'win32' )
   {
     expectedArguments[ 2 ].uid = null;
@@ -839,7 +842,7 @@ function spawnSyncError( test )
   let start = _.process.starter({ sync : 1, mode : 'spawn' });
   let beginCounter = 0;
   let endCounter = 0;
-  let subprocessStartEndGot,subprocessTerminationEndGot;
+  let subprocessStartEndGot, subprocessTerminationEndGot;
 
   var expectedArguments =
   [
@@ -852,7 +855,7 @@ function spawnSyncError( test )
       'windowsHide' : true
     }
   ]
-  
+
   if( process.platform !== 'win32' )
   {
     expectedArguments[ 2 ].uid = null;
@@ -910,7 +913,7 @@ function detached( test )
 {
   let context = this;
   let a = context.assetFor( test, null );
-  
+
   let testAppPath = a.path.nativize( a.program( testApp ) );
 
   let startBegin = 0;
@@ -943,19 +946,19 @@ function detached( test )
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
-  let o = 
-  { 
+  let o =
+  {
     execPath : 'node ' + testAppPath,
-    mode : 'spawn', 
-    detaching : 1, 
-    stdio : 'pipe', 
-    outputPiping : 1 
+    mode : 'spawn',
+    detaching : 1,
+    stdio : 'pipe',
+    outputPiping : 1
   }
-  
+
   _.process.start( o );
-  
+
   o.conStart.thenGive( () => o.disconnect() )
-  
+
   let ready = _.time.out( context.t2 * 5 );
 
   ready.then( () =>
@@ -964,7 +967,7 @@ function detached( test )
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
-    
+
     test.identical( descriptor.terminated, true );
     test.identical( descriptor.terminationEvent, 'exit' );
 
@@ -973,14 +976,14 @@ function detached( test )
     _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
     _.process.watcherDisable();
-    
+
     return null;
   })
-  
+
   /* */
 
   return ready;
-  
+
   function testApp()
   {
     let _ = require( toolsPath );
@@ -997,7 +1000,7 @@ function detached( test )
   }
 }
 
-detached.description = 
+detached.description =
 `
 Checks that termination of detached and disconnected child process works
 `
@@ -1006,7 +1009,7 @@ function watcherWaitForExit( test )
 {
   let context = this;
   let a = context.assetFor( test, null );
-  
+
   let testAppPath = a.path.nativize( a.program( testApp ) );
 
   let startBegin = 0;
@@ -1020,19 +1023,19 @@ function watcherWaitForExit( test )
   let subprocessStartBegin = ( o ) =>
   {
     startBegin++;
-    processesCounterStartBegin = _.process.__watcherProcessCounter;
+    processesCounterStartBegin = _.process.__watcherProcessDescriptors.length;
   }
 
   let subprocessStartEnd = ( o ) =>
   {
     startEnd++;
-    processesCounterStartEnd = _.process.__watcherProcessCounter;
+    processesCounterStartEnd = _.process.__watcherProcessDescriptors.length;
   }
   let subprocessTerminationEnd = ( o ) =>
   {
     descriptor = o;
     endCounter++;
-    processesCounterTerminateEnd = _.process.__watcherProcessCounter;
+    processesCounterTerminateEnd = _.process.__watcherProcessDescriptors.length;
   }
 
   test.identical( startBegin, 0 );
@@ -1045,20 +1048,20 @@ function watcherWaitForExit( test )
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
-  let o = 
-  { 
+  let o =
+  {
     execPath : 'node ' + testAppPath,
-    mode : 'spawn', 
-    stdio : 'pipe', 
-    outputPiping : 1 
+    mode : 'spawn',
+    stdio : 'pipe',
+    outputPiping : 1
   }
-  
+
   _.process.start( o );
-  
+
   let ready = _.process.watcherWaitForExit
-  ({ 
-    waitForAllNamespaces : 1, 
-    timeOut : context.t1 * 10 
+  ({
+    waitForAllNamespaces : 1,
+    timeOut : context.t1 * 10
   })
 
   ready.then( () =>
@@ -1067,10 +1070,10 @@ function watcherWaitForExit( test )
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
-    
+
     test.identical( descriptor.terminated, true );
     test.identical( descriptor.terminationEvent, 'close' );
-    
+
     test.identical( processesCounterStartBegin, 0 );
     test.identical( processesCounterStartEnd, 1 );
     test.identical( processesCounterTerminateEnd, 0 );
@@ -1080,21 +1083,21 @@ function watcherWaitForExit( test )
     _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
     _.process.watcherDisable();
-    
+
     return null;
   })
-  
+
   /* */
 
   return ready;
-  
+
   function testApp()
   {
     console.log( 'Child process start', process.pid );
-    setTimeout( () => 
+    setTimeout( () =>
     {
       console.log( 'Child process end', process.pid );
-      
+
     }, context.t1 * 5 )
   }
 }
@@ -1143,15 +1146,15 @@ var Proto =
 
     spawnError,
     spawnSyncError,
-    
+
     detached,
-    
+
     watcherWaitForExit
   },
 
 }
 
-_.mapExtend( Self,Proto );
+_.mapExtend( Self, Proto );
 
 //
 

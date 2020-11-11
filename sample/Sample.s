@@ -10,7 +10,7 @@ var options = { stdio : 'inherit', shell : true };
 /* Spawn child process that will print homedir path before using process watcher */
 
 console.log( 'Homedir before arguments patching:' );
-ChildProcess.spawnSync( process.argv[ 0 ], args, options, );
+ChildProcess.spawnSync( process.argv[ 0 ], args, options );
 
 /* Enable process watcher and register callback that will be executed before spawning the child process */
 
