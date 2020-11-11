@@ -74,6 +74,9 @@ function watcherEnable()
 
   _.mapSupplement( processNamespace._ehandler.events, Events );
   _.arrayAppendOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  
+  if( processNamespace.__watcherProcessCounter === undefined )
+  processNamespace.__watcherProcessCounter = 0;
 
   /* qqq : ?? */
   // _.process.on( 'exit', () =>
@@ -156,7 +159,8 @@ function watcherEnable()
       //   return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
       // });
 
-      _eventHandle( 'subprocessStartEnd', o )
+      // _eventHandle( 'subprocessStartEnd', o )
+      _eventHandleStartEnd( o );
 
       /* Uses exit event to handle termination of disconnected and detached process */
 
@@ -210,12 +214,19 @@ function watcherEnable()
   }
 
   /* */
+  
+  function _eventHandleStartEnd( o )
+  {
+    processNamespace.__watcherProcessCounter += 1;
+    _eventHandle( 'subprocessStartEnd', o );
+  }
 
   function _eventHandleTerminationEnd( o )
   {
     if( o.terminated )
     return;
     o.terminated = true;
+    processNamespace.__watcherProcessCounter -= 1;
     _eventHandle( 'subprocessTerminationEnd', o );
   }
 }
@@ -280,6 +291,8 @@ function watcherDisable()
   return true;
 
   _.arrayRemoveOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  
+  delete processNamespace.__watcherProcessCounter;
 
   if( ChildProcess._namespaces.length )
   return true;
@@ -319,6 +332,65 @@ function watcherIsEnabled()
   return false;
 }
 
+function watcherWaitForExit( o )
+{
+  let processNamespace = this;
+  
+  o = o || Object.create( null );
+  
+  _.routineOptions( watcherWaitForExit, o );
+  
+  let namespacesToCheck = o.waitForAllNamespaces ? ChildProcess._namespaces.slice() : [ processNamespace ];
+  let numberOfNamespaces = namespacesToCheck.length;
+  
+  let ready = _.Consequence();
+  let timer = _.time.periodic( 100, () => 
+  {
+    _.each( namespacesToCheck, ( namespace, k ) => 
+    {
+      if( namespace )
+      if( !namespace.__watcherProcessCounter )
+      {
+        namespacesToCheck[ k ] = null;
+        numberOfNamespaces -= 1;
+      }
+    })
+    
+    if( numberOfNamespaces > 0 )
+    return true;
+    
+    ready.take( true );
+  })
+  
+  let timeOutError = _.time.outError( o.timeOut )
+  
+  ready.orKeeping( [ timeOutError ] )
+  
+  ready.finally( ( err, arg ) =>
+  {
+    if( !err || err.reason !== 'time out' )
+    timeOutError.error( _.dont );
+
+    if( !err )
+    return arg;
+
+    timer.cancel();
+
+    throw err;
+  })
+  
+  /* */
+  
+  return ready;
+}
+
+watcherWaitForExit.defaults = 
+{
+  waitForAllNamespaces : 1,
+  timeOut : 5000
+}
+
+
 //
 
 let _on = Self.on;
@@ -356,6 +428,7 @@ let NamespaceBlueprint =
   watcherEnable,
   watcherDisable,
   watcherIsEnabled,
+  watcherWaitForExit
 }
 
 _.construction.extend( Self, NamespaceBlueprint );
