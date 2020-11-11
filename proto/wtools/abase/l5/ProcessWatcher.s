@@ -106,15 +106,26 @@ function watcherEnable()
 
     ChildProcess[ routine ] = function()
     {
+      let o = 
+      {
+        arguments : Array.prototype.slice.call( arguments ),
+        execPath : arguments[ 0 ],
+        args : arguments[ 1 ],
+        options : arguments[ 2 ],
+        currentPath : null,
+        process : null,
+        sync : null,
+        terminated : false,
+        terminationEvent : null
+      }
+      
+      if( o.options )
+      o.currentPath = o.options.cwd;
+      
       if( sync )
       {
-        var o =
-        {
-          arguments : Array.prototype.slice.call( arguments ),
-          process : null,
-          sync : 1,
-          terminated : false
-        }
+        o.sync = true;
+        
         // let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
 
         _eventHandle( 'subprocessStartBegin', o );
@@ -136,15 +147,8 @@ function watcherEnable()
         }
         return o.returned;
       }
-
-      var o =
-      {
-        arguments : Array.prototype.slice.call( arguments ),
-        process : null,
-        sync : 0,
-        terminated : false,
-        terminationEvent : null
-      }
+      
+      o.sync = false;
 
       _eventHandle( 'subprocessStartBegin', o );
 
@@ -152,7 +156,7 @@ function watcherEnable()
 
       if( !_.numberIs( o.process.pid ) )
       return o.process;
-
+      
       // let procedures = ChildProcess._namespaces.map( ( wTools ) =>
       // {
       //   /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
