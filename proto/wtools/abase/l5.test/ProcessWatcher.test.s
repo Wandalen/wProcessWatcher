@@ -108,6 +108,12 @@ function spawn( test )
       'windowsHide' : true
     }
   ]
+  
+  if( process.platform !== 'win32' )
+  {
+    expectedArguments[ 2 ].uid = null;
+    expectedArguments[ 2 ].gid = null;
+  }
 
   let subprocessStartEnd = ( o ) =>
   {
@@ -189,6 +195,12 @@ function spawnSync( test )
       'windowsHide' : true
     }
   ]
+  
+  if( process.platform !== 'win32' )
+  {
+    expectedArguments[ 2 ].uid = null;
+    expectedArguments[ 2 ].gid = null;
+  }
 
   let subprocessStartEnd = ( o ) =>
   {
@@ -268,6 +280,12 @@ function fork( test )
       'cwd' : process.cwd()
     }
   ]
+  
+  if( process.platform !== 'win32' )
+  {
+    expectedArguments[ 2 ].uid = null;
+    expectedArguments[ 2 ].gid = null;
+  }
 
   let subprocessStartEnd = ( o ) =>
   {
@@ -740,6 +758,12 @@ function spawnError( test )
       'windowsHide' : true
     }
   ]
+  
+  if( process.platform !== 'win32' )
+  {
+    expectedArguments[ 2 ].uid = null;
+    expectedArguments[ 2 ].gid = null;
+  }
 
   let subprocessStartBegin = ( o ) =>
   {
@@ -828,6 +852,12 @@ function spawnSyncError( test )
       'windowsHide' : true
     }
   ]
+  
+  if( process.platform !== 'win32' )
+  {
+    expectedArguments[ 2 ].uid = null;
+    expectedArguments[ 2 ].gid = null;
+  }
 
   let subprocessStartEnd = ( o ) =>
   {
@@ -972,6 +1002,103 @@ detached.description =
 Checks that termination of detached and disconnected child process works
 `
 
+function watcherWaitForExit( test )
+{
+  let context = this;
+  let a = context.assetFor( test, null );
+  
+  let testAppPath = a.path.nativize( a.program( testApp ) );
+
+  let startBegin = 0;
+  let startEnd = 0;
+  let endCounter = 0;
+  let descriptor = null;
+  let processesCounterStartBegin = null;
+  let processesCounterStartEnd = null;
+  let processesCounterTerminateEnd = null;
+
+  let subprocessStartBegin = ( o ) =>
+  {
+    startBegin++;
+    processesCounterStartBegin = _.process.__watcherProcessCounter;
+  }
+
+  let subprocessStartEnd = ( o ) =>
+  {
+    startEnd++;
+    processesCounterStartEnd = _.process.__watcherProcessCounter;
+  }
+  let subprocessTerminationEnd = ( o ) =>
+  {
+    descriptor = o;
+    endCounter++;
+    processesCounterTerminateEnd = _.process.__watcherProcessCounter;
+  }
+
+  test.identical( startBegin, 0 );
+  test.identical( startEnd, 0 );
+  test.identical( endCounter, 0 );
+
+  _.process.watcherEnable();
+
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin )
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+  let o = 
+  { 
+    execPath : 'node ' + testAppPath,
+    mode : 'spawn', 
+    stdio : 'pipe', 
+    outputPiping : 1 
+  }
+  
+  _.process.start( o );
+  
+  let ready = _.process.watcherWaitForExit
+  ({ 
+    waitForAllNamespaces : 1, 
+    timeOut : context.t1 * 10 
+  })
+
+  ready.then( () =>
+  {
+    test.is( !_.process.isAlive( o.process.pid ) );
+    test.identical( startBegin, 1 );
+    test.identical( startEnd, 1 );
+    test.identical( endCounter, 1 );
+    
+    test.identical( descriptor.terminated, true );
+    test.identical( descriptor.terminationEvent, 'close' );
+    
+    test.identical( processesCounterStartBegin, 0 );
+    test.identical( processesCounterStartEnd, 1 );
+    test.identical( processesCounterTerminateEnd, 0 );
+
+    _.process.off( 'subprocessStartBegin', subprocessStartBegin )
+    _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+    _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+    _.process.watcherDisable();
+    
+    return null;
+  })
+  
+  /* */
+
+  return ready;
+  
+  function testApp()
+  {
+    console.log( 'Child process start', process.pid );
+    setTimeout( () => 
+    {
+      console.log( 'Child process end', process.pid );
+      
+    }, context.t1 * 5 )
+  }
+}
+
 // --
 // test
 // --
@@ -1017,7 +1144,9 @@ var Proto =
     spawnError,
     spawnSyncError,
     
-    detached
+    detached,
+    
+    watcherWaitForExit
   },
 
 }
