@@ -1,4 +1,5 @@
-( function _ProcessWatcher_s_() {
+( function _ProcessWatcher_s_()
+{
 
 'use strict';
 
@@ -74,9 +75,9 @@ function watcherEnable()
 
   _.mapSupplement( processNamespace._ehandler.events, Events );
   _.arrayAppendOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
-  
-  if( processNamespace.__watcherProcessCounter === undefined )
-  processNamespace.__watcherProcessCounter = 0;
+
+  if( processNamespace.__watcherProcessDescriptors === undefined )
+  processNamespace.__watcherProcessDescriptors = [];
 
   /* qqq : ?? */
   // _.process.on( 'exit', () =>
@@ -106,7 +107,7 @@ function watcherEnable()
 
     ChildProcess[ routine ] = function()
     {
-      let o = 
+      let o =
       {
         arguments : Array.prototype.slice.call( arguments ),
         execPath : arguments[ 0 ],
@@ -118,14 +119,14 @@ function watcherEnable()
         terminated : false,
         terminationEvent : null
       }
-      
+
       if( o.options )
       o.currentPath = o.options.cwd;
-      
+
       if( sync )
       {
         o.sync = true;
-        
+
         // let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
 
         _eventHandle( 'subprocessStartBegin', o );
@@ -135,19 +136,14 @@ function watcherEnable()
         {
           o.returned = original.apply( ChildProcess, arguments );
         }
-        catch( err )
-        {
-          throw err;
-        }
         finally
         {
           // procedures.forEach( procedure => procedure.end() )
           _eventHandleTerminationEnd( o );
-
         }
         return o.returned;
       }
-      
+
       o.sync = false;
 
       _eventHandle( 'subprocessStartBegin', o );
@@ -156,7 +152,7 @@ function watcherEnable()
 
       if( !_.numberIs( o.process.pid ) )
       return o.process;
-      
+
       // let procedures = ChildProcess._namespaces.map( ( wTools ) =>
       // {
       //   /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
@@ -194,7 +190,7 @@ function watcherEnable()
 
   /* */
 
-  function _eventHandle( eventName, o )
+  function _eventHandle( eventName, descriptor )
   {
     ChildProcess._namespaces.forEach( ( wTools ) =>
     {
@@ -207,7 +203,7 @@ function watcherEnable()
       {
         try
         {
-          callback.call( wTools.process, o );
+          callback.call( wTools.process, descriptor );
         }
         catch( err )
         {
@@ -218,20 +214,33 @@ function watcherEnable()
   }
 
   /* */
-  
-  function _eventHandleStartEnd( o )
+
+  function _eventHandleStartEnd( descriptor )
   {
-    processNamespace.__watcherProcessCounter += 1;
-    _eventHandle( 'subprocessStartEnd', o );
+    ChildProcess._namespaces.forEach( ( wTools ) =>
+    {
+      if( !wTools.process.watcherIsEnabled() )
+      return;
+      _.arrayAppendOnce( wTools.process.__watcherProcessDescriptors, descriptor );
+    });
+
+    _eventHandle( 'subprocessStartEnd', descriptor );
   }
 
-  function _eventHandleTerminationEnd( o )
+  function _eventHandleTerminationEnd( descriptor )
   {
-    if( o.terminated )
+    if( descriptor.terminated )
     return;
-    o.terminated = true;
-    processNamespace.__watcherProcessCounter -= 1;
-    _eventHandle( 'subprocessTerminationEnd', o );
+    descriptor.terminated = true;
+
+    ChildProcess._namespaces.forEach( ( wTools ) =>
+    {
+      if( !wTools.process.watcherIsEnabled() )
+      return;
+      _.arrayRemoveOnce( wTools.process.__watcherProcessDescriptors, descriptor );
+    });
+
+    _eventHandle( 'subprocessTerminationEnd', descriptor );
   }
 }
 
@@ -295,8 +304,8 @@ function watcherDisable()
   return true;
 
   _.arrayRemoveOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
-  
-  delete processNamespace.__watcherProcessCounter;
+
+  delete processNamespace.__watcherProcessDescriptors;
 
   if( ChildProcess._namespaces.length )
   return true;
@@ -339,45 +348,39 @@ function watcherIsEnabled()
 function watcherWaitForExit( o )
 {
   let processNamespace = this;
-  
+
   o = o || Object.create( null );
-  
+
   _.routineOptions( watcherWaitForExit, o );
-  
+
   let namespacesToCheck;
-  
+
   if( o.waitForAllNamespaces )
-  namespacesToCheck = ChildProcess._namespaces.map( ( namespace ) => namespace.process );
+  namespacesToCheck = ChildProcess._namespaces.map( ( tools ) => tools.process );
   else
   namespacesToCheck = [ processNamespace ];
-  
-  let numberOfNamespaces = namespacesToCheck.length;
-  
-  debugger
-  
+
   let ready = _.Consequence();
-  let timer = _.time.periodic( 100, () => 
+  let timer = _.time.periodic( 100, () =>
   {
-    _.each( namespacesToCheck, ( namespace, k ) => 
+
+    for( let i = namespacesToCheck.length - 1; i >= 0; i-- )
     {
-      if( namespace )
-      if( !namespace.__watcherProcessCounter )
-      {
-        namespacesToCheck[ k ] = null;
-        numberOfNamespaces -= 1;
-      }
-    })
-    
-    if( numberOfNamespaces > 0 )
+      let namespace = namespacesToCheck[ i ];
+      if( namespace.__watcherProcessDescriptors.length === 0 )
+      namespacesToCheck.splice( i, 1 );
+    }
+
+    if( namespacesToCheck.length )
     return true;
-    
+
     ready.take( true );
   })
-  
+
   let timeOutError = _.time.outError( o.timeOut )
-  
+
   ready.orKeeping( [ timeOutError ] )
-  
+
   ready.finally( ( err, arg ) =>
   {
     if( !err || err.reason !== 'time out' )
@@ -390,13 +393,13 @@ function watcherWaitForExit( o )
 
     throw err;
   })
-  
+
   /* */
-  
+
   return ready;
 }
 
-watcherWaitForExit.defaults = 
+watcherWaitForExit.defaults =
 {
   waitForAllNamespaces : 1,
   timeOut : 5000
