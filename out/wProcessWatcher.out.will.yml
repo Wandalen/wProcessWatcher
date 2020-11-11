@@ -2,15 +2,12 @@ format: outwillfile-2.0
 root:
   - wProcessWatcher.out
 consistency:
-  wProcessWatcher.out.will.yml: &ref_0
-    hash: abbc22126634aff4ca8e0d384d88635f
-    size: 39385
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 114dddc4824709a38b7b18501f7f15f8
     size: 2128
-  ../.im.will.yml: &ref_2
-    hash: 9fd0d099e6a3ed529085bcb5aaddaf98
-    size: 5225
+  ../.im.will.yml: &ref_1
+    hash: 5c2d8a1babe3947c60985d4118131842
+    size: 5333
 module:
   wProcessWatcher.out:
     about:
@@ -25,21 +22,21 @@ module:
         termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - watch
         - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -200,6 +197,12 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
+        autoExporting: 0
+        enabled: 0
+        criterion:
+          development: 1
+      eslint:
+        path: 'npm:///eslint#7.1.0'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -711,24 +714,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -817,9 +802,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wProcessWatcher.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wProcessWatcher
@@ -833,23 +817,13 @@ module:
         termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - watch
-        - child process
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
+      contributors: *ref_4
       npm.name: wprocesswatcher
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -987,6 +961,12 @@ module:
           development: 1
       wTesting:
         path: 'npm:///wTesting'
+        autoExporting: 0
+        enabled: 0
+        criterion:
+          development: 1
+      eslint:
+        path: 'npm:///eslint#7.1.0'
         autoExporting: 0
         enabled: 0
         criterion:
@@ -1526,6 +1506,5 @@ module:
         hash: 114dddc4824709a38b7b18501f7f15f8
         size: 2128
       ../.im.will.yml:
-        hash: 9fd0d099e6a3ed529085bcb5aaddaf98
-        size: 5225
-      wProcessWatcher.out.will.yml: *ref_0
+        hash: 5c2d8a1babe3947c60985d4118131842
+        size: 5333
