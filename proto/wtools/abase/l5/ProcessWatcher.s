@@ -344,8 +344,16 @@ function watcherWaitForExit( o )
   
   _.routineOptions( watcherWaitForExit, o );
   
-  let namespacesToCheck = o.waitForAllNamespaces ? ChildProcess._namespaces.slice() : [ processNamespace ];
+  let namespacesToCheck;
+  
+  if( o.waitForAllNamespaces )
+  namespacesToCheck = ChildProcess._namespaces.map( ( namespace ) => namespace.process );
+  else
+  namespacesToCheck = [ processNamespace ];
+  
   let numberOfNamespaces = namespacesToCheck.length;
+  
+  debugger
   
   let ready = _.Consequence();
   let timer = _.time.periodic( 100, () => 
