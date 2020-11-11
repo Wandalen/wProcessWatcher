@@ -30,6 +30,6 @@
     "wprocedure" : "",
     "wprocess" : ""
   },
-  "devDependencies" : { "wTesting" : "", "wprocess" : "", "wprocesswatcher" : "file:." },
+  "devDependencies" : { "wTesting" : "", "wprocess" : "", "wprocesswatcher" : "file:.", "eslint" : "7.1.0" },
   "keywords" : [ "wTools", "watch", "child process" ]
 }
