@@ -1,3 +1,5 @@
+const { Z_ASCII } = require('zlib');
+
 ( function _ProcessWatcher_test_s( )
 {
 
@@ -23,6 +25,7 @@ if( typeof module !== 'undefined' )
 
 let _global = _global_;
 let _ = _global_.wTools;
+let _realGlobal = _global._realGlobal_;
 let Self = {};
 
 // --
@@ -87,6 +90,32 @@ function isRunning( pid )
   {
     return e.code === 'EPERM'
   }
+}
+
+//
+
+let _wasGlobal, _wasCache;
+function globalNamespaceOpen( _global, name )
+{
+  if( _realGlobal_._globals_[ name ] )
+  throw Error( 'Global namespace::name already exists!' );
+  let Module = require( 'module' );
+  _wasCache = Module._cache;
+  _wasGlobal = _global;
+  Module._cache = Object.create( null );
+  _global = Object.create( _global );
+  _global.__GLOBAL_NAME__ = name;
+  _realGlobal_._global_ = _global;
+  _realGlobal_._globals_[ name ] = _global;
+}
+
+//
+
+function globalNamespaceClose()
+{
+  let Module = require( 'module' );
+  Module._cache = _wasCache;
+  _global_ = _wasGlobal;
 }
 
 //
@@ -702,13 +731,51 @@ function watcherDisable( test )
 
 //
 
+function internal( test )
+{
+  let context = this;
+
+  context.globalNamespaceOpen( _global, 'namespaceForTest' );
+
+  _.assert( !!_realGlobal_._globals_[ 'namespaceForTest' ] );
+
+  if( ChildProcess._namespaces )
+  test.is( !_.longHas( ChildProcess._namespaces, _global.wTools.process ) );
+  test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
+
+  _global.wTools.process.watcherEnable();
+  test.is( _.longHas( ChildProcess._namespaces, _global.wTools ) );
+  test.is( _global.wTools.process.watcherIsEnabled() );
+  test.identical( _global.wTools.process.__watcherProcessDescriptors, [] );
+
+  _global.wTools.process.watcherDisable();
+  test.is( !_global.wTools.process.watcherIsEnabled() );
+  if( ChildProcess._namespaces )
+  test.is( !_.longHas( ChildProcess._namespaces, _global.wTools ) );
+  else
+  test.identical( ChildProcess._namespaces, undefined );
+  test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
+
+  context.globalNamespaceClose();
+
+  _.assert( _global === _wasGlobal );
+}
+
+internal.description =
+`
+Checks internal fields of child process and process watcher in on/off states.
+Creates own global namespace for the test.
+`
+
+//
+
 function patchHomeDir( test )
 {
   let self = this;
 
   let start = _.process.starter
   ({
-    execPath : process.argv[ 0 ],
+    execPath : _.strQuote( process.argv[ 0 ] ),
     mode : 'spawn',
     outputCollecting : 1
   });
@@ -1102,6 +1169,113 @@ function watcherWaitForExit( test )
   }
 }
 
+//
+
+function watcherWaitForExitTimeOut( test )
+{
+  let context = this;
+  let a = context.assetFor( test, null );
+
+  let testAppPath = a.path.nativize( a.program( testApp ) );
+
+  let startBegin = 0;
+  let startEnd = 0;
+  let endCounter = 0;
+  let descriptor = null;
+  let processesCounterStartBegin = null;
+  let processesCounterStartEnd = null;
+  let processesCounterTerminateEnd = null;
+
+  let subprocessStartBegin = ( o ) =>
+  {
+    startBegin++;
+    processesCounterStartBegin = _.process.__watcherProcessDescriptors.length;
+  }
+
+  let subprocessStartEnd = ( o ) =>
+  {
+    startEnd++;
+    processesCounterStartEnd = _.process.__watcherProcessDescriptors.length;
+  }
+  let subprocessTerminationEnd = ( o ) =>
+  {
+    descriptor = o;
+    endCounter++;
+    processesCounterTerminateEnd = _.process.__watcherProcessDescriptors.length;
+  }
+
+  test.identical( startBegin, 0 );
+  test.identical( startEnd, 0 );
+  test.identical( endCounter, 0 );
+
+  _.process.watcherEnable();
+
+  _.process.on( 'subprocessStartBegin', subprocessStartBegin )
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+  _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+  let o =
+  {
+    execPath : 'node ' + testAppPath,
+    mode : 'spawn',
+    stdio : 'pipe',
+    outputPiping : 1
+  }
+
+  _.process.start( o );
+
+  let ready = _.process.watcherWaitForExit
+  ({
+    waitForAllNamespaces : 1,
+    timeOut : context.t1 * 2
+  })
+
+  ready.finally( ( err, arg ) =>
+  {
+    _.errAttend( err );
+    test.is( _.errIs( err ) );
+    test.identical( err.reason, 'time out' );
+    return null;
+  })
+
+  o.conTerminate.then( () =>
+  {
+    test.is( !_.process.isAlive( o.process.pid ) );
+    test.identical( startBegin, 1 );
+    test.identical( startEnd, 1 );
+    test.identical( endCounter, 1 );
+
+    test.identical( descriptor.terminated, true );
+    test.identical( descriptor.terminationEvent, 'close' );
+
+    test.identical( processesCounterStartBegin, 0 );
+    test.identical( processesCounterStartEnd, 1 );
+    test.identical( processesCounterTerminateEnd, 0 );
+
+    _.process.off( 'subprocessStartBegin', subprocessStartBegin )
+    _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+    _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
+
+    _.process.watcherDisable();
+
+    return null;
+  })
+
+  /* */
+
+  return _.Consequence.AndKeep( ready, o.conTerminate );
+
+  function testApp()
+  {
+    console.log( 'Child process start', process.pid );
+    setTimeout( () =>
+    {
+      console.log( 'Child process end', process.pid );
+
+    }, context.t1 * 10 )
+  }
+}
+
 // --
 // test
 // --
@@ -1127,6 +1301,8 @@ var Proto =
     t3 : 15000,
     isRunning,
     assetFor,
+    globalNamespaceOpen,
+    globalNamespaceClose
   },
 
   tests :
@@ -1141,6 +1317,7 @@ var Proto =
     execFileSync,
 
     watcherDisable,
+    internal,
 
     patchHomeDir,
 
@@ -1149,7 +1326,8 @@ var Proto =
 
     detached,
 
-    watcherWaitForExit
+    watcherWaitForExit,
+    watcherWaitForExitTimeOut
   },
 
 }
