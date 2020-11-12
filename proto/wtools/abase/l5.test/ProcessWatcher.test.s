@@ -737,7 +737,7 @@ function internal( test )
 
   context.globalNamespaceOpen( _global, 'namespaceForTest' );
 
-  _.assert( _global !== _wasGlobal );
+  _.assert( !!_realGlobal_._globals_[ 'namespaceForTest' ] );
 
   if( ChildProcess._namespaces )
   test.is( !_.longHas( ChildProcess._namespaces, _global.wTools.process ) );
