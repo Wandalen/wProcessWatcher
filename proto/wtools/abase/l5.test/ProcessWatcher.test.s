@@ -708,7 +708,7 @@ function patchHomeDir( test )
 
   let start = _.process.starter
   ({
-    execPath : process.argv[ 0 ],
+    execPath : _.strQuote( process.argv[ 0 ] ),
     mode : 'spawn',
     outputCollecting : 1
   });
