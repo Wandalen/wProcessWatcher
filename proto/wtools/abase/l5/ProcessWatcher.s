@@ -148,15 +148,15 @@ function watcherEnable()
 
       _eventHandle( 'subprocessStartBegin', o );
 
-      o.process = original.apply( ChildProcess, arguments );
+      o.pnd = original.apply( ChildProcess, arguments );
 
-      if( !_.numberIs( o.process.pid ) )
-      return o.process;
+      if( !_.numberIs( o.pnd.pid ) )
+      return o.pnd;
 
       // let procedures = ChildProcess._namespaces.map( ( wTools ) =>
       // {
       //   /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
-      //   return wTools.procedure.begin({ _name : 'PID:' + o.process.pid, _object : o.process });
+      //   return wTools.procedure.begin({ _name : 'PID:' + o.pnd.pid, _object : o.pnd });
       // });
 
       // _eventHandle( 'subprocessStartEnd', o )
@@ -164,7 +164,7 @@ function watcherEnable()
 
       /* Uses exit event to handle termination of disconnected and detached process */
 
-      o.process.on( 'exit', () =>
+      o.pnd.on( 'exit', () =>
       {
         /*
           Give a chance for 'close' event to emit 'subprocessTerminationEnd'
@@ -176,7 +176,7 @@ function watcherEnable()
         }, 100 )
       });
 
-      o.process.on( 'close', () =>
+      o.pnd.on( 'close', () =>
       {
         o.terminationEvent = 'close';
         _eventHandleTerminationEnd( o );
@@ -184,7 +184,7 @@ function watcherEnable()
 
       //
 
-      return o.process;
+      return o.pnd;
     }
   }
 

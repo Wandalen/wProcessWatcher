@@ -149,14 +149,14 @@ function spawn( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -236,14 +236,14 @@ function spawnSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null )
+    test.identical( o.pnd, null )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null )
+    test.identical( o.pnd, null )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -321,14 +321,14 @@ function fork( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -397,14 +397,14 @@ function exec( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -486,14 +486,14 @@ function execFile( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.true( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -561,13 +561,13 @@ function execSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.true( _.bufferAnyIs( o.returned ) );
     test.identical( o.arguments, expectedArguments );
     endCounter++
@@ -645,14 +645,14 @@ function execFileSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.true( _.bufferNodeIs( o.returned ) );
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
@@ -837,7 +837,7 @@ function spawnError( test )
 
   let subprocessStartBegin = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     startBegin++
   }
@@ -1030,7 +1030,7 @@ function detached( test )
 
   ready.then( () =>
   {
-    test.true( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
@@ -1133,7 +1133,7 @@ function watcherWaitForExit( test )
 
   ready.then( () =>
   {
-    test.true( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
@@ -1240,7 +1240,7 @@ function watcherWaitForExitTimeOut( test )
 
   o.conTerminate.then( () =>
   {
-    test.true( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
