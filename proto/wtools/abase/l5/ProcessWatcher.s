@@ -61,10 +61,10 @@ function watcherEnable()
   if( !ChildProcess  )
   ChildProcess = require( 'child_process' );
 
-  if( !ChildProcess._namespaces )
-  ChildProcess._namespaces = []
+  if( !_realGlobal_._ProcessWatcherNamespaces )
+  _realGlobal_._ProcessWatcherNamespaces = []; /* qqq : ?? */
 
-  _.assert( _.arrayIs( ChildProcess._namespaces ) );
+  _.assert( _.arrayIs( _realGlobal_._ProcessWatcherNamespaces ) );
 
   patch( 'spawn' );
   patch( 'fork' );
@@ -74,24 +74,14 @@ function watcherEnable()
   patch( 'execSync' );
 
   _.mapSupplement( processNamespace._ehandler.events, Events );
-  _.arrayAppendOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  _.arrayAppendOnce( _realGlobal_._ProcessWatcherNamespaces, CurrentGlobal.wTools );
 
   if( processNamespace.__watcherProcessDescriptors === undefined )
   processNamespace.__watcherProcessDescriptors = [];
 
-  /* qqq : ?? */
-  // _.process.on( 'exit', () =>
-  // {
-  //   if( _.process.watcherIsEnabled() )
-  //   _.process.watcherDisable();
-  // })
-
   return true;
 
   /*  */
-
-  // qqq : why 2 different suroutines?
-  // qqq Vova : merged subroutines
 
   function patch( routine )
   {
@@ -127,8 +117,6 @@ function watcherEnable()
       {
         o.sync = true;
 
-        // let procedures = ChildProcess._namespaces.map( ( wTools ) => wTools.procedure.begin({} ) );
-
         _eventHandle( 'subprocessStartBegin', o );
         _eventHandle( 'subprocessStartEnd', o );
 
@@ -138,7 +126,6 @@ function watcherEnable()
         }
         finally
         {
-          // procedures.forEach( procedure => procedure.end() )
           _eventHandleTerminationEnd( o );
         }
         return o.returned;
@@ -153,13 +140,6 @@ function watcherEnable()
       if( !_.numberIs( o.pnd.pid ) )
       return o.pnd;
 
-      // let procedures = ChildProcess._namespaces.map( ( wTools ) =>
-      // {
-      //   /* qqq : enable storing of ChildProcess instance in _object, agree launch with _.process.start */
-      //   return wTools.procedure.begin({ _name : 'PID:' + o.pnd.pid, _object : o.pnd });
-      // });
-
-      // _eventHandle( 'subprocessStartEnd', o )
       _eventHandleStartEnd( o );
 
       /* Uses exit event to handle termination of disconnected and detached process */
@@ -182,8 +162,6 @@ function watcherEnable()
         _eventHandleTerminationEnd( o );
       });
 
-      //
-
       return o.pnd;
     }
   }
@@ -192,7 +170,7 @@ function watcherEnable()
 
   function _eventHandle( eventName, descriptor )
   {
-    ChildProcess._namespaces.forEach( ( wTools ) =>
+    _realGlobal_._ProcessWatcherNamespaces.forEach( ( wTools ) =>
     {
       if( !wTools.process.watcherIsEnabled() )
       return;
@@ -217,7 +195,7 @@ function watcherEnable()
 
   function _eventHandleStartEnd( descriptor )
   {
-    ChildProcess._namespaces.forEach( ( wTools ) =>
+    _realGlobal_._ProcessWatcherNamespaces.forEach( ( wTools ) =>
     {
       if( !wTools.process.watcherIsEnabled() )
       return;
@@ -233,7 +211,7 @@ function watcherEnable()
     return;
     descriptor.terminated = true;
 
-    ChildProcess._namespaces.forEach( ( wTools ) =>
+    _realGlobal_._ProcessWatcherNamespaces.forEach( ( wTools ) =>
     {
       if( !wTools.process.watcherIsEnabled() )
       return;
@@ -300,14 +278,14 @@ function watcherDisable()
   if( !ChildProcess  )
   ChildProcess = require( 'child_process' );
 
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   return true;
 
-  _.arrayRemoveOnce( ChildProcess._namespaces, CurrentGlobal.wTools );
+  _.arrayRemoveOnce( _realGlobal_._ProcessWatcherNamespaces, CurrentGlobal.wTools );
 
   delete processNamespace.__watcherProcessDescriptors;
 
-  if( ChildProcess._namespaces.length )
+  if( _realGlobal_._ProcessWatcherNamespaces.length )
   return true;
 
   unpatch( 'spawn' );
@@ -317,7 +295,7 @@ function watcherDisable()
   unpatch( 'execFileSync' )
   unpatch( 'execSync' )
 
-  delete ChildProcess._namespaces;
+  delete _realGlobal_._ProcessWatcherNamespaces;
 
   return true;
 
@@ -356,7 +334,7 @@ function watcherWaitForExit( o )
   let namespacesToCheck;
 
   if( o.waitForAllNamespaces )
-  namespacesToCheck = ChildProcess._namespaces.map( ( tools ) => tools.process );
+  namespacesToCheck = _realGlobal_._ProcessWatcherNamespaces.map( ( tools ) => tools.process );
   else
   namespacesToCheck = [ processNamespace ];
 

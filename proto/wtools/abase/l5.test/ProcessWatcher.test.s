@@ -187,7 +187,7 @@ function spawn( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -272,7 +272,7 @@ function spawnSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -359,7 +359,7 @@ function fork( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -435,7 +435,7 @@ function exec( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -524,7 +524,7 @@ function execFile( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -596,7 +596,7 @@ function execSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -685,7 +685,7 @@ function execFileSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -739,21 +739,21 @@ function internal( test )
 
   _.assert( !!_realGlobal_._globals_[ 'namespaceForTest' ] );
 
-  if( ChildProcess._namespaces )
-  test.true( !_.longHas( ChildProcess._namespaces, _global.wTools.process ) );
+  if( _realGlobal_._ProcessWatcherNamespaces )
+  test.true( !_.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools.process ) );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
   _global.wTools.process.watcherEnable();
-  test.true( _.longHas( ChildProcess._namespaces, _global.wTools ) );
+  test.true( _.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools ) );
   test.true( _global.wTools.process.watcherIsEnabled() );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, [] );
 
   _global.wTools.process.watcherDisable();
   test.true( !_global.wTools.process.watcherIsEnabled() );
-  if( ChildProcess._namespaces )
-  test.true( !_.longHas( ChildProcess._namespaces, _global.wTools ) );
+  if( _realGlobal_._ProcessWatcherNamespaces )
+  test.true( !_.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools ) );
   else
-  test.identical( ChildProcess._namespaces, undefined );
+  test.identical( _realGlobal_._ProcessWatcherNamespaces, undefined );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
   context.globalNamespaceClose();
@@ -884,7 +884,7 @@ function spawnError( test )
 
     _.process.watcherDisable();
 
-    if( !ChildProcess._namespaces )
+    if( !_realGlobal_._ProcessWatcherNamespaces )
     {
       test.true( !_.routineIs( ChildProcess._spawn ) );
       test.true( !_.routineIs( ChildProcess._execFile ) );
@@ -963,7 +963,7 @@ function spawnSyncError( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
     test.true( !_.routineIs( ChildProcess._spawn ) );
     test.true( !_.routineIs( ChildProcess._execFile ) );
