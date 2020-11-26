@@ -389,7 +389,7 @@ watcherWaitForExit.defaults =
 let _on = Self.on;
 function on()
 {
-  if( arguments.length === 2 && !_.event.chainIs( arguments[ 0 ] ) )
+  if( arguments.length === 2 && _.strIs( arguments[ 0 ] ) )
   if( Events[ arguments[ 0 ] ] )
   {
     _.assert( _.routineIs( arguments[ 1 ] ) );
