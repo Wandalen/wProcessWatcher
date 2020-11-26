@@ -112,6 +112,8 @@ function watcherEnable()
 
       if( o.options )
       o.currentPath = o.options.cwd;
+      else
+      o.currentPath = process.cwd();
 
       if( sync )
       {
