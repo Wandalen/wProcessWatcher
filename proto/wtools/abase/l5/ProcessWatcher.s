@@ -389,12 +389,12 @@ watcherWaitForExit.defaults =
 let _on = Self.on;
 function on()
 {
-  if( arguments.length === 2 && _.strIs( arguments[ 0 ] ) )
-  if( Events[ arguments[ 0 ] ] )
-  {
-    _.assert( _.routineIs( arguments[ 1 ] ) );
-    arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
-  }
+  // if( arguments.length === 2 && _.strIs( arguments[ 0 ] ) )
+  // if( Events[ arguments[ 0 ] ] )
+  // {
+  _.assert( _.routineIs( arguments[ 1 ] ) );
+  arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+  // }
   let o2 = _on.apply( this, arguments );
   return o2;
 }

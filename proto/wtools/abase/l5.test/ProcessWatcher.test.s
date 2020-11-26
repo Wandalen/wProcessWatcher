@@ -1285,7 +1285,7 @@ function onAnotherEvents( test )
   var callback = () => arr.push( 'string' );
   var got = _.process.on( 'available', callback );
   test.identical( got.callbackMap.available, callback );
-  test.identical( callback._callLocation, undefined );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
   _.process.eventGive( 'available' );
   test.identical( arr, [ 'string' ] );
 
@@ -1295,7 +1295,7 @@ function onAnotherEvents( test )
   var got = _.process.on( _.event.Chain( 'uncaughtError', 'uncaughtError', 'available' ), callback );
   test.identical( got.callbackMap.available, undefined );
   test.identical( _.process._ehandler.events.available, [] );
-  test.identical( callback._callLocation, undefined );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
   _.process.eventGive( 'uncaughtError' );
   _.process.eventGive( 'uncaughtError' );
   test.identical( _.process._ehandler.events.available[ 0 ].native, callback );
