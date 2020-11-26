@@ -109,6 +109,7 @@ rules :
       before : false
       after : false
       overrides :
+        of : { 'before' : true }
         return : { 'after' : true }
         let : { 'after' : true }
         const : { 'after' : true }
@@ -386,6 +387,7 @@ rules :
   no-unused-vars :
     - warn
     - args : 'none'
+  no-ex-assign : warn
 
   # play with this later
 

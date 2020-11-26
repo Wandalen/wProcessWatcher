@@ -149,14 +149,14 @@ function spawn( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -167,11 +167,11 @@ function spawn( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -187,20 +187,20 @@ function spawn( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.is( subprocessStartEndGot.proces !== got.process );
-  test.is( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.process );
+  test.true( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -236,14 +236,14 @@ function spawnSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null )
+    test.identical( o.pnd, null )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null )
+    test.identical( o.pnd, null )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -254,11 +254,11 @@ function spawnSync( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -272,14 +272,14 @@ function spawnSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node -v' )
@@ -321,14 +321,14 @@ function fork( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -339,11 +339,11 @@ function fork( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -359,20 +359,20 @@ function fork( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.is( subprocessStartEndGot.proces !== got.process );
-  test.is( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.process );
+  test.true( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -397,14 +397,14 @@ function exec( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -415,11 +415,11 @@ function exec( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -435,20 +435,20 @@ function exec( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.is( subprocessStartEndGot.proces !== got.process );
-  test.is( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.process );
+  test.true( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -486,14 +486,14 @@ function execFile( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.is( o.process instanceof ChildProcess.ChildProcess )
+    test.true( o.pnd instanceof ChildProcess.ChildProcess )
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -504,11 +504,11 @@ function execFile( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -524,20 +524,20 @@ function execFile( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.is( subprocessStartEndGot.proces !== got.process );
-  test.is( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.process );
+  test.true( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -561,14 +561,14 @@ function execSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null );
-    test.is( _.bufferAnyIs( o.returned ) );
+    test.identical( o.pnd, null );
+    test.true( _.bufferAnyIs( o.returned ) );
     test.identical( o.arguments, expectedArguments );
     endCounter++
   }
@@ -578,11 +578,11 @@ function execSync( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -596,14 +596,14 @@ function execSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node -v' )
@@ -645,15 +645,15 @@ function execFileSync( test )
 
   let subprocessStartEnd = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
-    test.identical( o.process, null );
-    test.is( _.bufferNodeIs( o.returned ) );
+    test.identical( o.pnd, null );
+    test.true( _.bufferNodeIs( o.returned ) );
     test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
@@ -664,11 +664,11 @@ function execFileSync( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -685,20 +685,20 @@ function execFileSync( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.is( subprocessStartEndGot.proces !== got.process );
-  test.is( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.process );
+  test.true( subprocessTerminationEndGot.proces !== got.process );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -715,17 +715,17 @@ function watcherDisable( test )
 
   test.case = 'disable with handler registered'
   _.process.watcherEnable();
-  test.is( _.process.watcherIsEnabled() )
+  test.true( _.process.watcherIsEnabled() )
   _.process.on( 'subprocessStartBegin', subprocessStartBegin );
   _.process.on( 'subprocessStartBegin', subprocessStartBegin2 );
   test.shouldThrowErrorSync( () => _.process.watcherDisable() );
-  test.is( _.process.watcherIsEnabled() )
+  test.true( _.process.watcherIsEnabled() )
 
   test.case = 'unregister handler then disable watcher'
   _.process.off( 'subprocessStartBegin', subprocessStartBegin );
   _.process.off( 'subprocessStartBegin', subprocessStartBegin2 );
   _.process.watcherDisable()
-  test.is( !_.process.watcherIsEnabled() )
+  test.true( !_.process.watcherIsEnabled() )
 
 }
 
@@ -739,21 +739,21 @@ function internal( test )
 
   _.assert( !!_realGlobal_._globals_[ 'namespaceForTest' ] );
 
-  if( ChildProcess._namespaces )
-  test.is( !_.longHas( ChildProcess._namespaces, _global.wTools.process ) );
+  if( _realGlobal_._ProcessWatcherNamespaces )
+  test.true( !_.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools.process ) );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
   _global.wTools.process.watcherEnable();
-  test.is( _.longHas( ChildProcess._namespaces, _global.wTools ) );
-  test.is( _global.wTools.process.watcherIsEnabled() );
+  test.true( _.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools ) );
+  test.true( _global.wTools.process.watcherIsEnabled() );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, [] );
 
   _global.wTools.process.watcherDisable();
-  test.is( !_global.wTools.process.watcherIsEnabled() );
-  if( ChildProcess._namespaces )
-  test.is( !_.longHas( ChildProcess._namespaces, _global.wTools ) );
+  test.true( !_global.wTools.process.watcherIsEnabled() );
+  if( _realGlobal_._ProcessWatcherNamespaces )
+  test.true( !_.longHas( _realGlobal_._ProcessWatcherNamespaces, _global.wTools ) );
   else
-  test.identical( ChildProcess._namespaces, undefined );
+  test.identical( _realGlobal_._ProcessWatcherNamespaces, undefined );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
   context.globalNamespaceClose();
@@ -799,7 +799,7 @@ function patchHomeDir( test )
   .then( ( got ) =>
   {
     test.identical( got.exitCode, 0 );
-    test.is( _.strHas( got.output, homedirPath ) );
+    test.true( _.strHas( got.output, homedirPath ) );
     _.process.off( 'subprocessStartBegin', onPatch )
     _.process.watcherDisable();
     return null;
@@ -837,7 +837,7 @@ function spawnError( test )
 
   let subprocessStartBegin = ( o ) =>
   {
-    test.identical( o.process, null );
+    test.identical( o.pnd, null );
     test.identical( o.arguments, expectedArguments );
     startBegin++
   }
@@ -857,11 +857,11 @@ function spawnError( test )
 
   _.process.watcherEnable();
 
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartBegin', subprocessStartBegin )
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
@@ -884,14 +884,14 @@ function spawnError( test )
 
     _.process.watcherDisable();
 
-    if( !ChildProcess._namespaces )
+    if( !_realGlobal_._ProcessWatcherNamespaces )
     {
-      test.is( !_.routineIs( ChildProcess._spawn ) );
-      test.is( !_.routineIs( ChildProcess._execFile ) );
-      test.is( !_.routineIs( ChildProcess._fork ) );
-      test.is( !_.routineIs( ChildProcess._spawnSync ) );
-      test.is( !_.routineIs( ChildProcess._execSync ) );
-      test.is( !_.routineIs( ChildProcess._execFileSync ) );
+      test.true( !_.routineIs( ChildProcess._spawn ) );
+      test.true( !_.routineIs( ChildProcess._execFile ) );
+      test.true( !_.routineIs( ChildProcess._fork ) );
+      test.true( !_.routineIs( ChildProcess._spawnSync ) );
+      test.true( !_.routineIs( ChildProcess._execSync ) );
+      test.true( !_.routineIs( ChildProcess._execFileSync ) );
     }
 
     return null;
@@ -946,11 +946,11 @@ function spawnSyncError( test )
   test.identical( endCounter, 0 );
 
   _.process.watcherEnable();
-  test.is( _.routineIs( ChildProcess._spawn ) );
-  test.is( _.routineIs( ChildProcess._execFile ) );
-  test.is( _.routineIs( ChildProcess._fork ) );
-  test.is( _.routineIs( ChildProcess._spawnSync ) );
-  test.is( _.routineIs( ChildProcess._execFileSync ) );
+  test.true( _.routineIs( ChildProcess._spawn ) );
+  test.true( _.routineIs( ChildProcess._execFile ) );
+  test.true( _.routineIs( ChildProcess._fork ) );
+  test.true( _.routineIs( ChildProcess._spawnSync ) );
+  test.true( _.routineIs( ChildProcess._execFileSync ) );
 
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -963,14 +963,14 @@ function spawnSyncError( test )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
   _.process.watcherDisable();
-  if( !ChildProcess._namespaces )
+  if( !_realGlobal_._ProcessWatcherNamespaces )
   {
-    test.is( !_.routineIs( ChildProcess._spawn ) );
-    test.is( !_.routineIs( ChildProcess._execFile ) );
-    test.is( !_.routineIs( ChildProcess._fork ) );
-    test.is( !_.routineIs( ChildProcess._spawnSync ) );
-    test.is( !_.routineIs( ChildProcess._execSync ) );
-    test.is( !_.routineIs( ChildProcess._execFileSync ) );
+    test.true( !_.routineIs( ChildProcess._spawn ) );
+    test.true( !_.routineIs( ChildProcess._execFile ) );
+    test.true( !_.routineIs( ChildProcess._fork ) );
+    test.true( !_.routineIs( ChildProcess._spawnSync ) );
+    test.true( !_.routineIs( ChildProcess._execSync ) );
+    test.true( !_.routineIs( ChildProcess._execFileSync ) );
   }
 }
 
@@ -1030,7 +1030,7 @@ function detached( test )
 
   ready.then( () =>
   {
-    test.is( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
@@ -1133,7 +1133,7 @@ function watcherWaitForExit( test )
 
   ready.then( () =>
   {
-    test.is( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
@@ -1233,14 +1233,14 @@ function watcherWaitForExitTimeOut( test )
   ready.finally( ( err, arg ) =>
   {
     _.errAttend( err );
-    test.is( _.errIs( err ) );
+    test.true( _.errIs( err ) );
     test.identical( err.reason, 'time out' );
     return null;
   })
 
   o.conTerminate.then( () =>
   {
-    test.is( !_.process.isAlive( o.process.pid ) );
+    test.true( !_.process.isAlive( o.pnd.pid ) );
     test.identical( startBegin, 1 );
     test.identical( startEnd, 1 );
     test.identical( endCounter, 1 );
