@@ -1276,6 +1276,43 @@ function watcherWaitForExitTimeOut( test )
   }
 }
 
+//
+
+function onAnotherEvents( test )
+{
+  test.case = 'add event of original _.process';
+  var arr = [];
+  var callback = () => arr.push( 'string' );
+  var got = _.process.on( 'available', callback );
+  test.identical( got.callbackMap.available, callback );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
+  _.process.eventGive( 'available' );
+  test.identical( arr, [ 'string' ] );
+
+  test.case = 'add Chain with events of original _.process';
+  var arr = [];
+  var callback = () => arr.push( 'string' );
+  var got = _.process.on( _.event.Chain( 'uncaughtError', 'uncaughtError', 'available' ), callback );
+  test.identical( got.callbackMap.available, undefined );
+  test.identical( _.process._ehandler.events.available, [] );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
+  _.process.eventGive( 'uncaughtError' );
+  _.process.eventGive( 'uncaughtError' );
+  test.identical( _.process._ehandler.events.available[ 0 ].native, callback );
+  _.process.eventGive( 'available' );
+  test.identical( arr, [ 'string' ] );
+
+  _.process.watcherDisable();
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'unknown event';
+  test.shouldThrowErrorSync( () => _.process.on( 'event', () => 'event' ) );
+}
+
 // --
 // test
 // --
@@ -1327,7 +1364,9 @@ var Proto =
     detached,
 
     watcherWaitForExit,
-    watcherWaitForExitTimeOut
+    watcherWaitForExitTimeOut,
+
+    onAnotherEvents,
   },
 
 }
