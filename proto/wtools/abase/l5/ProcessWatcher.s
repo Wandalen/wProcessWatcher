@@ -110,7 +110,8 @@ function watcherEnable()
         terminationEvent : null
       }
 
-      if( o.options )
+
+      if( o.options && o.options.cwd )
       o.currentPath = o.options.cwd;
       else
       o.currentPath = process.cwd();
