@@ -1541,7 +1541,13 @@ function watcherWaitForExitTimeOut( test )
 
 function onAnotherEvents( test )
 {
-  test.case = 'add event of original _.process';
+  let context = this;
+  let a = context.assetFor( test, null );
+  let testAppPath = a.path.nativize( a.program( testApp ) );
+
+  /* */
+
+  test.case = 'add event of original _.process, single call';
   var arr = [];
   var callback = () => arr.push( 'string' );
   var got = _.process.on( 'available', callback );
@@ -1549,6 +1555,33 @@ function onAnotherEvents( test )
   test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
   _.process.eventGive( 'available' );
   test.identical( arr, [ 'string' ] );
+
+  /* */
+
+  test.case = 'add event of original _.process, several calls';
+  var arr = [];
+  var callback = () => arr.push( 'string' );
+  var got = _.process.on( 'uncaughtError', callback );
+  test.identical( got.callbackMap.uncaughtError, callback );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
+  _.process.eventGive( 'uncaughtError' );
+  _.process.eventGive( 'uncaughtError' );
+  test.identical( arr, [ 'string', 'string' ] );
+  got.off( 'uncaughtError' );
+
+  /* */
+
+  test.case = 'add event available _.process, several calls';
+  var arr = [];
+  var callback = () => arr.push( 'string' );
+  var got = _.process.on( 'available', callback );
+  test.identical( got.callbackMap.available, callback );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
+  _.process.eventGive( 'available' );
+  _.process.eventGive( 'available' );
+  test.identical( arr, [ 'string' ] );
+
+  /* */
 
   test.case = 'add Chain with events of original _.process';
   var arr = [];
@@ -1563,7 +1596,40 @@ function onAnotherEvents( test )
   _.process.eventGive( 'available' );
   test.identical( arr, [ 'string' ] );
 
-  _.process.watcherDisable();
+  /* */
+
+  test.case = 'add event of ProcessWatcher';
+  var arr = [];
+  var callback = () => arr.push( 'string' );
+  _.process.watcherEnable();
+  var got = _.process.on( 'subprocessStartBegin', callback );
+  test.identical( _.strCount( callback._callLocation, 'at Object.onAnotherEvents' ), 1 );
+  test.identical( got.callbackMap.subprocessStartBegin, callback );
+  let o =
+  {
+    execPath : 'node ' + testAppPath,
+    mode : 'spawn',
+    stdio : 'pipe',
+    outputPiping : 1,
+  };
+  _.process.start( o );
+  let ready = _.process.watcherWaitForExit
+  ({
+    waitForAllNamespaces : 1,
+    timeOut : context.t1 * 10
+  })
+
+  ready.then( () =>
+  {
+    test.true( !_.process.isAlive( o.pnd.pid ) );
+    test.identical( arr, [ 'string' ] );
+    _.process.off( 'subprocessStartBegin', callback );
+    _.process.watcherDisable();
+
+    return null;
+  });
+
+  return ready;
 
   /* - */
 
@@ -1572,7 +1638,21 @@ function onAnotherEvents( test )
 
   test.case = 'unknown event';
   test.shouldThrowErrorSync( () => _.process.on( 'event', () => 'event' ) );
+
+  /* */
+
+  function testApp()
+  {
+    console.log( 'Child process start', process.pid );
+    setTimeout
+    ( () =>
+    {
+      console.log( 'Child process end', process.pid );
+    },
+    context.t1 );
+  }
 }
+onAnotherEvents.timeOut = 10000;
 
 // --
 // test
