@@ -104,7 +104,8 @@ function watcherEnable()
         args : arguments[ 1 ],
         options : arguments[ 2 ],
         currentPath : null,
-        process : null,
+        pnd : null, /* Dmytro : original module Process operates property pnd */
+        // process : null,
         sync : null,
         terminated : false,
         terminationEvent : null
