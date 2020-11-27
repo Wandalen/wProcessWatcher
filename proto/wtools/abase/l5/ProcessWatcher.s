@@ -104,15 +104,17 @@ function watcherEnable()
         args : arguments[ 1 ],
         options : arguments[ 2 ],
         currentPath : null,
-        pnd : null, /* Dmytro : original module Process operates property pnd */
-        // process : null,
+        pnd : null,
         sync : null,
         terminated : false,
         terminationEvent : null
       }
 
-      if( o.options )
+
+      if( o.options && o.options.cwd )
       o.currentPath = o.options.cwd;
+      else
+      o.currentPath = _.path.current();
 
       if( sync )
       {
