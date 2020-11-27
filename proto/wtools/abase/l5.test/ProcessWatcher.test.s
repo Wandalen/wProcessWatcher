@@ -136,7 +136,7 @@ function spawn( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : process.cwd(),
+      'cwd' : _.path.current(),
       'windowsHide' : true
     }
   ]
@@ -178,8 +178,31 @@ function spawn( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+
+  var expectedOptions =
+  {
+    stdio : [ 'pipe', 'pipe', 'pipe' ],
+    detached : false,
+    cwd : _.path.current(),
+    windowsHide : true,
+  }
+  if( process.platform !== 'win32' )
+  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    options : expectedOptions,
+    currentPath : _.path.current(),
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -199,8 +222,8 @@ function spawn( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -223,7 +246,7 @@ function spawnSync( test )
     {
       'stdio' :  [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : process.cwd(),
+      'cwd' : _.path.current(),
       'windowsHide' : true
     }
   ]
@@ -265,6 +288,31 @@ function spawnSync( test )
 
   var got = start( 'node -v' )
   test.identical( got.exitCode, 0 );
+
+  var expectedOptions =
+  {
+    stdio : [ 'pipe', 'pipe', 'pipe' ],
+    detached : false,
+    cwd : _.path.current(),
+    windowsHide : true,
+  }
+  if( process.platform !== 'win32' )
+  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    options : expectedOptions,
+    currentPath : _.path.current(),
+    sync : true,
+    terminated : true,
+    terminationEvent : null
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.true( _.objectIs( subprocessStartEndGot.returned ) )
+
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -309,7 +357,7 @@ function fork( test )
       'env' : null,
       'stdio' : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
       'execArgv' : process.execArgv,
-      'cwd' : process.cwd()
+      'cwd' : _.path.current()
     }
   ]
 
@@ -350,8 +398,32 @@ function fork( test )
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+
+  var expectedOptions =
+  {
+    stdio : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
+    detached : false,
+    cwd : _.path.current(),
+    env : null,
+    execArgv : []
+  }
+  if( process.platform !== 'win32' )
+  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : '-v',
+    args : [],
+    options : expectedOptions,
+    currentPath : _.path.current(),
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -371,8 +443,8 @@ function fork( test )
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -391,7 +463,7 @@ function exec( test )
   var expectedArguments =
   [
     'node "-v"',
-    { 'env' : null, 'cwd' : process.cwd(), 'shell' : true },
+    { 'env' : null, 'cwd' : _.path.current(), 'shell' : true },
     undefined
   ]
 
@@ -426,8 +498,8 @@ function exec( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -447,8 +519,8 @@ function exec( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -459,11 +531,11 @@ function execFile( test )
 {
   let self = this;
 
-  function start( exec, args )
+  function start( exec, args, options )
   {
     let ready = new _.Consequence();
-    var childProcess = ChildProcess.execFile( exec, args );
-    var result = { process : childProcess };
+    var childProcess = ChildProcess.execFile( exec, args, options );
+    var result = { pnd : childProcess };
     childProcess.on( 'close', ( exitCode, exitSignal ) =>
     {
       result.exitCode = exitCode;
@@ -478,23 +550,17 @@ function execFile( test )
   let endCounter = 0;
   let subprocessStartEndGot, subprocessTerminationEndGot;
 
-  var expectedArguments =
-  [
-    'node',
-    [ '-v' ]
-  ]
+
 
   let subprocessStartEnd = ( o ) =>
   {
     test.true( o.pnd instanceof ChildProcess.ChildProcess )
-    test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
   let subprocessTerminationEnd = ( o ) =>
   {
     test.true( o.pnd instanceof ChildProcess.ChildProcess )
-    test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
   }
@@ -513,12 +579,68 @@ function execFile( test )
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
+  /* - */
+
+  test.case = 'no options'
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+
+  var expectedArguments =
+  [
+    'node',
+    [ '-v' ]
+  ]
+
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    currentPath : _.path.current(),
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
+
+  /* */
+
+  test.case = 'with options'
+
+  var got = start( 'node', [ '-v' ], { cwd : __dirname } )
+  test.identical( got.exitCode, 0 );
+
+  var expectedArguments =
+  [
+    'node',
+    [ '-v' ],
+    { cwd : __dirname }
+  ]
+
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    currentPath : __dirname,
+    options : { cwd : __dirname },
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
+  test.identical( beginCounter, 2 );
+  test.identical( endCounter, 2 );
+
+  /* - */
 
   _.process.off( 'subprocessStartEnd', subprocessStartEnd )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -536,10 +658,10 @@ function execFile( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
-  test.identical( beginCounter, 1 );
-  test.identical( endCounter, 1 );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
+  test.identical( beginCounter, 2 );
+  test.identical( endCounter, 2 );
 
 }
 
@@ -556,7 +678,7 @@ function execSync( test )
   var expectedArguments =
   [
     'node "-v"',
-    { 'env' : null, 'cwd' : process.cwd() },
+    { 'env' : null, 'cwd' : _.path.current() },
   ]
 
   let subprocessStartEnd = ( o ) =>
@@ -618,18 +740,18 @@ function execFileSync( test )
 {
   let self = this;
 
-  function start( exec, args )
+  function start( exec, args, options )
   {
     var result = Object.create( null );
     try
     {
-      result.process = ChildProcess.execFileSync( exec, args );
+      result.pnd = ChildProcess.execFileSync( exec, args, options );
       result.exitCode = 0;
     }
     catch( err )
     {
-      result.process = err;
-      result.exitCode = result.process.status;
+      result.pnd = err;
+      result.exitCode = result.pnd.status;
     }
     return result;
   }
@@ -637,16 +759,9 @@ function execFileSync( test )
   let endCounter = 0;
   let subprocessStartEndGot, subprocessTerminationEndGot;
 
-  var expectedArguments =
-  [
-    'node',
-    [ '-v' ]
-  ]
-
   let subprocessStartEnd = ( o ) =>
   {
     test.identical( o.pnd, null );
-    test.identical( o.arguments, expectedArguments );
     subprocessStartEndGot = o;
     beginCounter++
   }
@@ -654,7 +769,6 @@ function execFileSync( test )
   {
     test.identical( o.pnd, null );
     test.true( _.bufferNodeIs( o.returned ) );
-    test.identical( o.arguments, expectedArguments );
     subprocessTerminationEndGot = o;
     endCounter++
   }
@@ -673,13 +787,67 @@ function execFileSync( test )
   _.process.on( 'subprocessStartEnd', subprocessStartEnd )
   _.process.on( 'subprocessTerminationEnd', subprocessTerminationEnd )
 
+  /* - */
+
+  test.case = 'no options'
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, null );
-  test.identical( subprocessTerminationEndGot.process, null );
-  test.identical( subprocessTerminationEndGot.returned, got.process );
+
+  var expectedArguments =
+  [
+    'node',
+    [ '-v' ]
+  ]
+
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    currentPath : _.path.current(),
+    sync : true,
+    terminated : true,
+    terminationEvent : null
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.returned, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
+
+  /* - */
+
+  test.case = 'with options '
+  var got = start( 'node', [ '-v' ], { cwd : __dirname } )
+  test.identical( got.exitCode, 0 );
+
+  var expectedArguments =
+  [
+    'node',
+    [ '-v' ],
+    { cwd : __dirname }
+  ]
+
+  var expected =
+  {
+    arguments : expectedArguments,
+    execPath : 'node',
+    args : [ '-v' ],
+    options : { cwd : __dirname },
+    currentPath : __dirname,
+    sync : true,
+    terminated : true,
+    terminationEvent : null
+  }
+  test.contains( subprocessStartEndGot, expected )
+
+  test.identical( subprocessStartEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.returned, got.pnd );
+  test.identical( beginCounter, 2 );
+  test.identical( endCounter, 2 );
 
   _.process.off( 'subprocessStartEnd', subprocessStartEnd )
   _.process.off( 'subprocessTerminationEnd', subprocessTerminationEnd )
@@ -697,10 +865,105 @@ function execFileSync( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
-  test.identical( beginCounter, 1 );
-  test.identical( endCounter, 1 );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
+  test.identical( beginCounter, 2 );
+  test.identical( endCounter, 2 );
+}
+
+//
+
+function processDescriptor( test )
+{
+  let self = this;
+
+  let startSpawn = _.process.starter({ deasync : 1, mode : 'spawn' });
+  let subprocessStartEndGot;
+
+  let subprocessStartEnd = ( o ) =>
+  {
+    subprocessStartEndGot = o;
+  }
+
+  _.process.watcherEnable();
+
+  _.process.on( 'subprocessStartEnd', subprocessStartEnd )
+
+  /* */
+
+  test.case = 'spawn with options, cwd is calculated by start'
+  startSpawn( 'node -v' ).sync();
+  var expectedOptions =
+  {
+    stdio : [ 'pipe', 'pipe', 'pipe' ],
+    detached : false,
+    cwd : _.path.current(),
+    windowsHide : true,
+  }
+  if( process.platform !== 'win32' )
+  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  var expected =
+  {
+    arguments : [ 'node', [ '-v' ], expectedOptions ],
+    execPath : 'node',
+    args : [ '-v' ],
+    options : expectedOptions,
+    currentPath : _.path.current(),
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+  test.true( subprocessStartEndGot.pnd instanceof ChildProcess.ChildProcess );
+
+  /* */
+
+  test.case = 'spawn with options, cwd is provided as option'
+  startSpawn({ execPath : 'node -v', currentPath : __dirname }).sync();
+  var expectedOptions =
+  {
+    stdio : [ 'pipe', 'pipe', 'pipe' ],
+    detached : false,
+    cwd : __dirname,
+    windowsHide : true,
+  }
+  if( process.platform !== 'win32' )
+  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  var expected =
+  {
+    arguments : [ 'node', [ '-v' ], expectedOptions ],
+    execPath : 'node',
+    args : [ '-v' ],
+    options : expectedOptions,
+    currentPath : __dirname,
+    sync : false,
+    terminated : true,
+    terminationEvent : 'close'
+  }
+  test.contains( subprocessStartEndGot, expected )
+  test.true( subprocessStartEndGot.pnd instanceof ChildProcess.ChildProcess );
+
+  /* */
+
+  test.case = 'no spawn options'
+  ChildProcess.spawnSync( 'node', [ '-v' ] );
+  var expected =
+  {
+    arguments : [ 'node', [ '-v' ] ],
+    execPath : 'node',
+    args : [ '-v' ],
+    currentPath : _.path.current(),
+    sync : true,
+    terminated : true,
+  }
+  test.contains( subprocessStartEndGot, expected )
+  test.true( _.objectIs( subprocessStartEndGot.returned ) );
+
+  /* - */
+
+  _.process.off( 'subprocessStartEnd', subprocessStartEnd )
+
+  _.process.watcherDisable();
 }
 
 //
@@ -824,7 +1087,7 @@ function spawnError( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : process.cwd(),
+      'cwd' : _.path.current(),
       'windowsHide' : true
     }
   ]
@@ -918,7 +1181,7 @@ function spawnSyncError( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : process.cwd(),
+      'cwd' : _.path.current(),
       'windowsHide' : true
     }
   ]
@@ -1352,6 +1615,8 @@ var Proto =
     // execSync,
 
     execFileSync,
+
+    processDescriptor,
 
     watcherDisable,
     internal,

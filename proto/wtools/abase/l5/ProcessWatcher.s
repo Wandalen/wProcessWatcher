@@ -104,7 +104,7 @@ function watcherEnable()
         args : arguments[ 1 ],
         options : arguments[ 2 ],
         currentPath : null,
-        process : null,
+        pnd : null,
         sync : null,
         terminated : false,
         terminationEvent : null
@@ -114,7 +114,7 @@ function watcherEnable()
       if( o.options && o.options.cwd )
       o.currentPath = o.options.cwd;
       else
-      o.currentPath = process.cwd();
+      o.currentPath = _.path.current();
 
       if( sync )
       {
