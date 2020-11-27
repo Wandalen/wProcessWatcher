@@ -136,7 +136,7 @@ function spawn( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : _.path.current(),
+      'cwd' : _.path.nativize( _.path.current() ),
       'windowsHide' : true
     }
   ]
@@ -183,7 +183,7 @@ function spawn( test )
   {
     stdio : [ 'pipe', 'pipe', 'pipe' ],
     detached : false,
-    cwd : _.path.current(),
+    cwd : _.path.nativize( _.path.current() ),
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
@@ -194,7 +194,7 @@ function spawn( test )
     execPath : 'node',
     args : [ '-v' ],
     options : expectedOptions,
-    currentPath : _.path.current(),
+    currentPath : _.path.nativize( _.path.current() ),
     sync : false,
     terminated : true,
     terminationEvent : 'close'
@@ -246,7 +246,7 @@ function spawnSync( test )
     {
       'stdio' :  [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : _.path.current(),
+      'cwd' : _.path.nativize( _.path.current() ),
       'windowsHide' : true
     }
   ]
@@ -293,7 +293,7 @@ function spawnSync( test )
   {
     stdio : [ 'pipe', 'pipe', 'pipe' ],
     detached : false,
-    cwd : _.path.current(),
+    cwd : _.path.nativize( _.path.current() ),
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
@@ -304,7 +304,7 @@ function spawnSync( test )
     execPath : 'node',
     args : [ '-v' ],
     options : expectedOptions,
-    currentPath : _.path.current(),
+    currentPath : _.path.nativize( _.path.current() ),
     sync : true,
     terminated : true,
     terminationEvent : null
@@ -357,7 +357,7 @@ function fork( test )
       'env' : null,
       'stdio' : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
       'execArgv' : process.execArgv,
-      'cwd' : _.path.current()
+      'cwd' : _.path.nativize( _.path.current() )
     }
   ]
 
@@ -403,7 +403,7 @@ function fork( test )
   {
     stdio : [ 'pipe', 'pipe', 'pipe', 'ipc' ],
     detached : false,
-    cwd : _.path.current(),
+    cwd : _.path.nativize( _.path.current() ),
     env : null,
     execArgv : []
   }
@@ -415,7 +415,7 @@ function fork( test )
     execPath : '-v',
     args : [],
     options : expectedOptions,
-    currentPath : _.path.current(),
+    currentPath : _.path.nativize( _.path.current() ),
     sync : false,
     terminated : true,
     terminationEvent : 'close'
@@ -463,7 +463,7 @@ function exec( test )
   var expectedArguments =
   [
     'node "-v"',
-    { 'env' : null, 'cwd' : _.path.current(), 'shell' : true },
+    { 'env' : null, 'cwd' : _.path.nativize( _.path.current() ), 'shell' : true },
     undefined
   ]
 
@@ -678,7 +678,7 @@ function execSync( test )
   var expectedArguments =
   [
     'node "-v"',
-    { 'env' : null, 'cwd' : _.path.current() },
+    { 'env' : null, 'cwd' : _.path.nativize( _.path.current() ) },
   ]
 
   let subprocessStartEnd = ( o ) =>
@@ -897,7 +897,7 @@ function processDescriptor( test )
   {
     stdio : [ 'pipe', 'pipe', 'pipe' ],
     detached : false,
-    cwd : _.path.current(),
+    cwd : _.path.nativize( _.path.current() ),
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
@@ -908,7 +908,7 @@ function processDescriptor( test )
     execPath : 'node',
     args : [ '-v' ],
     options : expectedOptions,
-    currentPath : _.path.current(),
+    currentPath : _.path.nativize( _.path.current() ),
     sync : false,
     terminated : true,
     terminationEvent : 'close'
@@ -1087,7 +1087,7 @@ function spawnError( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : _.path.current(),
+      'cwd' : _.path.nativize( _.path.current() ),
       'windowsHide' : true
     }
   ]
@@ -1181,7 +1181,7 @@ function spawnSyncError( test )
     {
       'stdio' : [ 'pipe', 'pipe', 'pipe' ],
       'detached' : false,
-      'cwd' : _.path.current(),
+      'cwd' : _.path.nativize( _.path.current() ),
       'windowsHide' : true
     }
   ]
