@@ -178,8 +178,8 @@ function spawn( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -199,8 +199,8 @@ function spawn( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -350,8 +350,8 @@ function fork( test )
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -371,8 +371,8 @@ function fork( test )
 
   var got = start( '-v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -426,8 +426,8 @@ function exec( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+  test.identical( subprocessStartEndGot.pnd, got.pnd );
+  test.identical( subprocessTerminationEndGot.pnd, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -447,8 +447,8 @@ function exec( test )
 
   var got = start( 'node -v' ).sync();
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.proces !== got.pnd );
+  test.true( subprocessTerminationEndGot.proces !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
@@ -515,8 +515,8 @@ function execFile( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, got.process );
-  test.identical( subprocessTerminationEndGot.process, got.process );
+  test.identical( subprocessStartEndGot.process, got.pnd );
+  test.identical( subprocessTerminationEndGot.process, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -536,8 +536,8 @@ function execFile( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -623,12 +623,12 @@ function execFileSync( test )
     var result = Object.create( null );
     try
     {
-      result.process = ChildProcess.execFileSync( exec, args );
+      result.pnd = ChildProcess.execFileSync( exec, args );
       result.exitCode = 0;
     }
     catch( err )
     {
-      result.process = err;
+      result.pnd = err;
       result.exitCode = result.process.status;
     }
     return result;
@@ -675,9 +675,9 @@ function execFileSync( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.identical( subprocessStartEndGot.process, null );
-  test.identical( subprocessTerminationEndGot.process, null );
-  test.identical( subprocessTerminationEndGot.returned, got.process );
+  test.identical( subprocessStartEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.pnd, null );
+  test.identical( subprocessTerminationEndGot.returned, got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 
@@ -697,8 +697,8 @@ function execFileSync( test )
 
   var got = start( 'node', [ '-v' ] )
   test.identical( got.exitCode, 0 );
-  test.true( subprocessStartEndGot.proces !== got.process );
-  test.true( subprocessTerminationEndGot.proces !== got.process );
+  test.true( subprocessStartEndGot.pnd !== got.pnd );
+  test.true( subprocessTerminationEndGot.pnd !== got.pnd );
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
 }
