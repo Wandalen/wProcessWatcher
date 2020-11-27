@@ -550,8 +550,6 @@ function execFile( test )
   let endCounter = 0;
   let subprocessStartEndGot, subprocessTerminationEndGot;
 
-
-
   let subprocessStartEnd = ( o ) =>
   {
     test.true( o.pnd instanceof ChildProcess.ChildProcess )
