@@ -397,9 +397,30 @@ function on()
   //   arguments[ 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
   // }
 
-  _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
+  // _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
   let o2 = _on.apply( this, arguments );
-  arguments[ arguments.length - 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+  if( arguments.length === 2 )
+  {
+    _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
+    arguments[ arguments.length - 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+  }
+  else if( arguments.length === 1 )
+  {
+    let o = arguments[ 0 ];
+    _.assert( _.mapIs( o ) );
+    for( let c in o.callbackMap )
+    {
+      if( _.routineIs( o.callbackMap[ c ] ) )
+      {
+        o.callbackMap[ c ]._callLocation = _.introspector.stack([ 1, 2 ]);
+      }
+      else
+      {
+        let length = o.callbackMap[ c ].length;
+        o.callbackMap[ c ][ length - 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
+      }
+    }
+  }
   return o2;
 }
 
