@@ -398,8 +398,9 @@ function on()
   // }
 
   // _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
-  let o2 = _on.apply( this, arguments );
-  if( arguments.length === 2 )
+
+  let o = _.event.on.head( _.event.on, arguments );
+  let o2 = _on.call( this, o );if( arguments.length === 2 )
   {
     _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
     arguments[ arguments.length - 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
