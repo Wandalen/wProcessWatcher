@@ -1768,7 +1768,7 @@ function onWithOptionsMap( test )
   var result = [];
   var onEvent = () => result.push( result.length );
   var onEvent2 = () => result.push( -1 * result.length );
-  var got = _.process.on({ 'callbackMap' : { 'uncaughtError' : onEvent }} );
+  var got = _.process.on({ 'callbackMap' : { 'uncaughtError' : onEvent } } );
   _.event.eventGive( _.process._ehandler, 'uncaughtError' );
   test.identical( result, [ 0 ] );
   _.event.eventGive( _.process._ehandler, 'uncaughtError' );
