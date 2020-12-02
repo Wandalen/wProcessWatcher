@@ -13,7 +13,6 @@
 
 if( typeof module !== 'undefined' )
 {
-
   let _ = require( '../../../wtools/Tools.s' );
   _.include( 'wProto' )
   _.include( 'wProcedure' )
@@ -401,8 +400,11 @@ function on()
 
   // _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
 
+  /* qqq xxx : ? */
   let o = _.event.on.head( _.event.on, arguments );
-  let o2 = _on.call( this, o );if( arguments.length === 2 )
+  let o2 = _on.call( this, o );
+
+  if( arguments.length === 2 )
   {
     _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
     arguments[ arguments.length - 1 ]._callLocation = _.introspector.stack([ 1, 2 ]);
