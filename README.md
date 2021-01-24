@@ -8,7 +8,7 @@ Collection of cross-platform routines for child process monitoring. Allows to ke
 git clone https://github.com/Wandalen/wProcessWatcher
 cd wProcessWatcher
 npm install
-node sample/Sample.s
+node sample/trivial/Sample.s
 ```
 
 ## To add to your project
