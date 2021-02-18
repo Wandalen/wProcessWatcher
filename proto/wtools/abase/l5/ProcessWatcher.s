@@ -57,7 +57,7 @@ function watcherEnable()
   let processNamespace = this;
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
-  if( !ChildProcess  )
+  if( !ChildProcess )
   ChildProcess = require( 'child_process' );
 
   if( !_realGlobal_._ProcessWatcherNamespaces )
@@ -277,7 +277,7 @@ function watcherDisable()
     delete processNamespace._ehandler.events[ eventName ];
   })
 
-  if( !ChildProcess  )
+  if( !ChildProcess )
   ChildProcess = require( 'child_process' );
 
   if( !_realGlobal_._ProcessWatcherNamespaces )
