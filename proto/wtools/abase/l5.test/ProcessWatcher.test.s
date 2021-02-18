@@ -1721,7 +1721,7 @@ function onWithArguments( test )
   test.identical( result, [ 0, 1 ] );
   _.event.eventGive( _.process._ehandler, 'event2' );
   _.event.eventGive( _.process._ehandler, 'event2' );
-  delete   _.process._ehandler.events.event2;
+  delete _.process._ehandler.events.event2;
   test.identical( result, [ 0, 1, -2, -3 ] );
   test.true( _.event.eventHasHandler( _.process._ehandler, { eventName : 'uncaughtError', eventHandler : onEvent } ) );
   got.uncaughtError.off();
