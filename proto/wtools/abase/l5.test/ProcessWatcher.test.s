@@ -1321,7 +1321,7 @@ function detached( test )
     _.time.out( context.t2 * 3, () =>
     {
       let filePath = _.path.join( __dirname, 'testFile' );
-      _.fileProvider.fileWrite( filePath, _.toStr( process.pid ) );
+      _.fileProvider.fileWrite( filePath, _.entity.exportString( process.pid ) );
       console.log( 'Child process end' )
       return null;
     })
