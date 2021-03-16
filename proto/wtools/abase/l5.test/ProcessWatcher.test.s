@@ -972,7 +972,7 @@ function watcherDisable( test )
   let subprocessStartBegin2 = () => {}
 
   test.case = 'disabled try to disable again'
-  test.mustNotThrowError( () => { debugger;_.process.watcherDisable() });
+  test.mustNotThrowError( () => { _.process.watcherDisable() });
 
   test.case = 'disable with handler registered'
   _.process.watcherEnable();
@@ -1752,7 +1752,6 @@ function onWithOptionsMap( test )
   var result = [];
   var onEvent = () => result.push( result.length );
   var onEvent2 = () => result.push( -1 * result.length );
-  debugger;
   var got = _.process.on({ 'callbackMap' : { 'uncaughtError' : onEvent } });
   _.event.eventGive( _.process._ehandler, 'uncaughtError' );
   test.identical( result, [ 0 ] );
