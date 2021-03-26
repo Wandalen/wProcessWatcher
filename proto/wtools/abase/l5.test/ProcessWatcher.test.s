@@ -22,11 +22,9 @@ if( typeof module !== 'undefined' )
 
 }
 
-
-let _global = _global_;
-let _ = _global_.wTools;
-let _realGlobal = _global._realGlobal_;
-let Self = {};
+const _global = _global_;
+const _ = _global_.wTools;
+const _realGlobal = _global._realGlobal_;
 
 // --
 // context
@@ -92,31 +90,40 @@ function isRunning( pid )
   }
 }
 
+// //
 //
-
-let _wasGlobal, _wasCache;
-function globalNamespaceOpen( _global, name )
-{
-  if( _realGlobal_._globals_[ name ] )
-  throw Error( 'Global namespace::name already exists!' );
-  let Module = require( 'module' );
-  _wasCache = Module._cache;
-  _wasGlobal = _global;
-  Module._cache = Object.create( null );
-  _global = Object.create( _global );
-  _global.__GLOBAL_NAME__ = name;
-  _realGlobal_._global_ = _global;
-  _realGlobal_._globals_[ name ] = _global;
-}
-
+// /* xxx : qqq : remove */
+// let _wasGlobal, _wasCache;
+// function globalNamespaceOpen( _global, name )
+// {
+//   if( _realGlobal_._globals_[ name ] )
+//   throw Error( `Global namespace::${name} already exists!` );
+//   let ModuleFileNative = require( 'module' );
+//   if( _global.moduleNativeFilesMap && _global.moduleNativeFilesMap !== ModuleFileNative._cache )
+//   throw Error( `Current global have native module files map of different global` );
+//   _global.moduleNativeFilesMap = ModuleFileNative._cache;
+//   _wasCache = ModuleFileNative._cache;
+//   _wasGlobal = _global;
+//   ModuleFileNative._cache = Object.create( null );
+//   _global = Object.create( _global );
+//   _global.moduleNativeFilesMap = ModuleFileNative._cache;
+//   _global.__GLOBAL_NAME__ = name;
+//   _global._global_ = _global;
+//   _realGlobal_._global_ = _global;
+//   _realGlobal_._globals_[ name ] = _global;
+//   if( module.nativeFilesMap )
+//   module.nativeFilesMap = ModuleFileNative._cache;
+//   return _global;
+// }
 //
-
-function globalNamespaceClose()
-{
-  let Module = require( 'module' );
-  Module._cache = _wasCache;
-  _global_ = _wasGlobal;
-}
+// //
+//
+// function globalNamespaceClose()
+// {
+//   let ModuleFileNative = require( 'module' );
+//   ModuleFileNative._cache = _wasCache;
+//   _global_ = _wasGlobal;
+// }
 
 //
 
@@ -995,8 +1002,13 @@ function watcherDisable( test )
 function internal( test )
 {
   let context = this;
+  let _wasGlobal = _global_;
 
-  context.globalNamespaceOpen( _global, 'namespaceForTest' );
+  // context.globalNamespaceOpen( _global, 'namespaceForTest' );
+  _.global.new( 'namespaceForTest', _global );
+  _.global.open( 'namespaceForTest' );
+
+  test.true( _global_ !== _wasGlobal );
 
   _.assert( !!_realGlobal_._globals_[ 'namespaceForTest' ] );
 
@@ -1017,9 +1029,10 @@ function internal( test )
   test.identical( _realGlobal_._ProcessWatcherNamespaces, undefined );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
-  context.globalNamespaceClose();
+  _.global.close( 'namespaceForTest' );
+  // context.globalNamespaceClose();
 
-  _.assert( _global === _wasGlobal );
+  test.true( _global_ === _wasGlobal );
 }
 
 internal.description =
@@ -1934,7 +1947,7 @@ function onCheckDescriptor( test )
 // test
 // --
 
-var Proto =
+const Proto =
 {
 
   name : 'Tools.l5.ProcessWatcher',
@@ -1955,8 +1968,8 @@ var Proto =
     t3 : 15000,
     isRunning,
     assetFor,
-    globalNamespaceOpen,
-    globalNamespaceClose
+    // globalNamespaceOpen,
+    // globalNamespaceClose
   },
 
   tests :
@@ -1964,9 +1977,9 @@ var Proto =
     spawn,
     spawnSync,
     fork,
-    // exec,
+    // exec, /* qqq : for Vova : ? */
     execFile,
-    // execSync,
+    // execSync, /* qqq : for Vova : ? */
 
     execFileSync,
 
@@ -1997,11 +2010,9 @@ var Proto =
 
 }
 
-_.mapExtend( Self, Proto );
-
 //
 
-Self = wTestSuite( Self );
+const Self = wTestSuite( Proto );
 
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self )

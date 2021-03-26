@@ -20,13 +20,13 @@ if( typeof module !== 'undefined' )
 }
 
 let ChildProcess;
-let CurrentGlobal = _global_;
-let _ = CurrentGlobal.wTools;
+const _global = _global_;
+const _ = _global.wTools;
 
-_.assert( !!CurrentGlobal.wTools, 'Does not have wTools' );
-_.assert( CurrentGlobal.wTools.process === undefined || CurrentGlobal.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
+_.assert( !!_global.wTools, 'Does not have wTools' );
+_.assert( _global.wTools.process === undefined || _global.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
 
-let Self = CurrentGlobal.wTools.process = CurrentGlobal.wTools.process || Object.create( null );
+const Self = _global.wTools.process = _global.wTools.process || Object.create( null );
 
 //
 
@@ -73,7 +73,7 @@ function watcherEnable()
   patch( 'execSync' );
 
   _.mapSupplement( processNamespace._ehandler.events, Events );
-  _.arrayAppendOnce( _realGlobal_._ProcessWatcherNamespaces, CurrentGlobal.wTools );
+  _.arrayAppendOnce( _realGlobal_._ProcessWatcherNamespaces, _global.wTools );
 
   if( processNamespace.__watcherProcessDescriptors === undefined )
   processNamespace.__watcherProcessDescriptors = [];
@@ -283,7 +283,7 @@ function watcherDisable()
   if( !_realGlobal_._ProcessWatcherNamespaces )
   return true;
 
-  _.arrayRemoveOnce( _realGlobal_._ProcessWatcherNamespaces, CurrentGlobal.wTools );
+  _.arrayRemoveOnce( _realGlobal_._ProcessWatcherNamespaces, _global.wTools );
 
   delete processNamespace.__watcherProcessDescriptors;
 
