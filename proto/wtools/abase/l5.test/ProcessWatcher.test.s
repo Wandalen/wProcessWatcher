@@ -999,6 +999,10 @@ function watcherDisable( test )
 
 //
 
+/* qqq : rewrite the test in separate pgroam.
+test that __GLOBAL_NAME__ of modules files of process watcher has proper value ( namespaceForTest )
+_.module.fileSetEnvironment( module, 'namespaceForTest' );
+*/
 function internal( test )
 {
   let context = this;
@@ -1006,7 +1010,7 @@ function internal( test )
 
   // context.globalNamespaceOpen( _global, 'namespaceForTest' );
   _.global.new( 'namespaceForTest', _global );
-  _.global.open( 'namespaceForTest' );
+  _.global._open( 'namespaceForTest' );
 
   test.true( _global_ !== _wasGlobal );
 
@@ -1029,7 +1033,7 @@ function internal( test )
   test.identical( _realGlobal_._ProcessWatcherNamespaces, undefined );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
-  _.global.close( 'namespaceForTest' );
+  _.global._close( 'namespaceForTest' );
   // context.globalNamespaceClose();
 
   test.true( _global_ === _wasGlobal );
