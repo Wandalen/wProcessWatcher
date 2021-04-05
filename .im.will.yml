@@ -89,8 +89,8 @@ path:
       raw: compiled
       content: prime
   npm.proto.entry:
-    - /pro/module/wProcessWatcher/proto/wtools/abase/l5/ProcessWatcher.s
-    - /pro/module/wProcessWatcher/proto/node_modules/wprocesswatcher
+    - proto/wtools/abase/l5/ProcessWatcher.s
+    - proto/node_modules/wprocesswatcher
 reflector:
   reflect.proto:
     inherit: predefined.*
