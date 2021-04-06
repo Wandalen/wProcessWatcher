@@ -10,7 +10,7 @@ let ChildProcess;
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../wtools/Tools.s' );
+  let _ = require( '../../../node_modules/Tools' );
 
   require( '../l5/ProcessWatcher.s' );
 
@@ -34,7 +34,7 @@ function suiteBegin()
 {
   var self = this;
   self.suiteTempPath = _.path.tempOpen( _.path.join( __dirname, '../..' ), 'ProcessWatcher' );
-  self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../wtools/Tools.s' ) );
+  self.toolsPath = _.path.nativize( _.path.resolve( __dirname, '../../../node_modules/Tools' ) );
   self.toolsPathInclude = `let _ = require( '${ _.strEscape( self.toolsPath ) }' )\n`;
 }
 
