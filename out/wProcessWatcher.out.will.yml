@@ -1552,6 +1552,4 @@ module:
       ../.im.will.yml:
         hash: b522284cdb3bb1022180491818b0a769
         size: 5222
-      wProcessWatcher.out.will.yml:
-        hash: a48087abfef39bf17270c1c87abda18c
-        size: 40054
+      wProcessWatcher.out.will.yml: *ref_0
