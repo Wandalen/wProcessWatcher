@@ -72,7 +72,7 @@ function watcherEnable()
   patch( 'execFileSync' );
   patch( 'execSync' );
 
-  _.mapSupplement( processNamespace._ehandler.events, Events );
+  _.props.supplement( processNamespace._ehandler.events, Events );
   _.arrayAppendOnce( _realGlobal_._ProcessWatcherNamespaces, _global.wTools );
 
   if( processNamespace.__watcherProcessDescriptors === undefined )
@@ -100,8 +100,8 @@ function watcherEnable()
       {
         arguments : Array.prototype.slice.call( arguments ),
         execPath : arguments[ 0 ],
-        args : arguments[ 1 ],
-        options : arguments[ 2 ],
+        args : ( arguments.length > 1 ? arguments[ 1 ] : null ),
+        options : ( arguments.length > 2 ? arguments[ 2 ] : null ),
         currentPath : null,
         pnd : null,
         sync : null,
@@ -331,7 +331,7 @@ function watcherWaitForExit( o )
 
   o = o || Object.create( null );
 
-  _.routineOptions( watcherWaitForExit, o );
+  _.routine.options_( watcherWaitForExit, o );
 
   let namespacesToCheck;
 

@@ -57,7 +57,7 @@ function assetFor( test, name )
 
   let oprogram = a.program;
   program_body.defaults = a.program.defaults;
-  a.program = _.routine.uniteCloning_( a.program.head, program_body );
+  a.program = _.routine.uniteCloning_replaceByUnite( a.program.head, program_body );
   return a;
 
   /* */
@@ -70,8 +70,8 @@ function assetFor( test, name )
       toolsPath : _.module.resolve( 'wTools' ),
     };
     o.locals = o.locals || locals;
-    _.mapSupplement( o.locals, locals );
-    _.mapSupplement( o.locals.context, locals.context );
+    _.props.supplement( o.locals, locals );
+    _.props.supplement( o.locals.context, locals.context );
     let programPath = a.path.nativize( oprogram.body.call( a, o ) );
     return programPath;
   }
@@ -194,7 +194,7 @@ function spawn( test )
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
-  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  _.props.extend( expectedOptions, { uid : null, gid : null } );
   var expected =
   {
     arguments : expectedArguments,
@@ -304,7 +304,7 @@ function spawnSync( test )
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
-  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  _.props.extend( expectedOptions, { uid : null, gid : null } );
   var expected =
   {
     arguments : expectedArguments,
@@ -415,7 +415,7 @@ function fork( test )
     execArgv : []
   }
   if( process.platform !== 'win32' )
-  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  _.props.extend( expectedOptions, { uid : null, gid : null } );
   var expected =
   {
     arguments : expectedArguments,
@@ -906,7 +906,7 @@ function processDescriptor( test )
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
-  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  _.props.extend( expectedOptions, { uid : null, gid : null } );
   var expected =
   {
     arguments : [ 'node', [ '-v' ], expectedOptions ],
@@ -933,7 +933,7 @@ function processDescriptor( test )
     windowsHide : true,
   }
   if( process.platform !== 'win32' )
-  _.mapExtend( expectedOptions, { uid : null, gid : null } );
+  _.props.extend( expectedOptions, { uid : null, gid : null } );
   var expected =
   {
     arguments : [ 'node', [ '-v' ], expectedOptions ],
@@ -1924,8 +1924,8 @@ function onCheckDescriptor( test )
   var result = [];
   var onEvent = () => result.push( result.length );
   var descriptor = _.process.on( 'uncaughtError', onEvent );
-  test.identical( _.mapKeys( descriptor ), [ 'uncaughtError' ] );
-  test.identical( _.mapKeys( descriptor.uncaughtError ), [ 'off', 'enabled', 'first', 'callbackMap' ] );
+  test.identical( _.props.keys( descriptor ), [ 'uncaughtError' ] );
+  test.identical( _.props.keys( descriptor.uncaughtError ), [ 'off', 'enabled', 'first', 'callbackMap' ] );
   test.identical( descriptor.uncaughtError.enabled, true );
   test.identical( descriptor.uncaughtError.first, 0 );
   test.equivalent( descriptor.uncaughtError.callbackMap, { uncaughtError : onEvent } );
@@ -1938,8 +1938,8 @@ function onCheckDescriptor( test )
   var result = [];
   var onEvent = () => result.push( result.length );
   var descriptor = _.process.on({ callbackMap : { 'uncaughtError' : onEvent } });
-  test.identical( _.mapKeys( descriptor ), [ 'uncaughtError' ] );
-  test.identical( _.mapKeys( descriptor.uncaughtError ), [ 'off', 'enabled', 'first', 'callbackMap' ] );
+  test.identical( _.props.keys( descriptor ), [ 'uncaughtError' ] );
+  test.identical( _.props.keys( descriptor.uncaughtError ), [ 'off', 'enabled', 'first', 'callbackMap' ] );
   test.identical( descriptor.uncaughtError.enabled, true );
   test.identical( descriptor.uncaughtError.first, 0 );
   test.equivalent( descriptor.uncaughtError.callbackMap, { uncaughtError : onEvent } );
