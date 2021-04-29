@@ -318,7 +318,7 @@ function spawnSync( test )
   }
   test.contains( subprocessStartEndGot, expected )
 
-  test.true( _.objectIs( subprocessStartEndGot.returned ) )
+  test.true( _.object.isBasic( subprocessStartEndGot.returned ) )
 
   test.identical( beginCounter, 1 );
   test.identical( endCounter, 1 );
@@ -962,7 +962,7 @@ function processDescriptor( test )
     terminated : true,
   }
   test.contains( subprocessStartEndGot, expected )
-  test.true( _.objectIs( subprocessStartEndGot.returned ) );
+  test.true( _.object.isBasic( subprocessStartEndGot.returned ) );
 
   /* - */
 
