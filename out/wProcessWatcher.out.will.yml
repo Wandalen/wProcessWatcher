@@ -2,13 +2,10 @@ format: outwillfile-2.0
 root:
   - wProcessWatcher.out
 consistency:
-  wProcessWatcher.out.will.yml: &ref_0
-    hash: a48087abfef39bf17270c1c87abda18c
-    size: 40054
-  ../.ex.will.yml: &ref_1
+  ../.ex.will.yml: &ref_0
     hash: 114dddc4824709a38b7b18501f7f15f8
     size: 2128
-  ../.im.will.yml: &ref_2
+  ../.im.will.yml: &ref_1
     hash: b522284cdb3bb1022180491818b0a769
     size: 5222
 module:
@@ -25,21 +22,21 @@ module:
         termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
+      interpreters: &ref_2
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords:
+      keywords: &ref_3
         - wTools
         - watch
         - child process
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
+      contributors: &ref_4
         - Kostiantyn Wandalen <wanalen@01.school>
         - Volodymyr M. <volodymyr.migdal@gmail.com>
       npm.name: wprocesswatcher
-      npm.scripts:
+      npm.scripts: &ref_5
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -724,24 +721,6 @@ module:
           content: prime
         inherit:
           - files.transpile
-      exported.proto.export:
-        opts:
-          filePath: 'reflector::exported.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
-      exported.files.proto.export:
-        opts:
-          filePath: 'reflector::exported.files.proto.export'
-        criterion:
-          generated: 1
-          content: proto
-          export: 1
-        inherit:
-          - files.reflect
     build:
       proto.export:
         steps:
@@ -830,9 +809,8 @@ module:
           content: proto
           export: 1
     consistency:
-      wProcessWatcher.out.will.yml: *ref_0
-      ../.ex.will.yml: *ref_1
-      ../.im.will.yml: *ref_2
+      ../.ex.will.yml: *ref_0
+      ../.im.will.yml: *ref_1
   ../:
     about:
       name: wProcessWatcher
@@ -846,23 +824,13 @@ module:
         termination stages.
       enabled: 1
       version: 0.4.0
-      interpreters:
-        - njs >= 10.0.0
-        - chrome >= 60.0.0
-        - firefox >= 60.0.0
-      keywords:
-        - wTools
-        - watch
-        - child process
+      interpreters: *ref_2
+      keywords: *ref_3
       license: MIT
       author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors:
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Volodymyr M. <volodymyr.migdal@gmail.com>
+      contributors: *ref_4
       npm.name: wprocesswatcher
-      npm.scripts:
-        test: wtest .run proto/**
-        docgen: wdocgen .build proto
+      npm.scripts: *ref_5
     path:
       module.willfiles:
         criterion:
@@ -1552,4 +1520,3 @@ module:
       ../.im.will.yml:
         hash: b522284cdb3bb1022180491818b0a769
         size: 5222
-      wProcessWatcher.out.will.yml: *ref_0
