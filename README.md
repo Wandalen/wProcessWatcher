@@ -1,4 +1,4 @@
-# module::ProcessWatcher [![status](https://github.com/Wandalen/wProcessWatcher/workflows/publish/badge.svg)](https://github.com/Wandalen/wProcessWatcher/actions?query=workflow%3Apublish) [![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
+# module::ProcessWatcher [![status](https://github.com/Wandalen/wProcessWatcher/actions/workflows/StandardPublish.yml/badge.svg)](https://github.com/Wandalen/wProcessWatcher/actions/workflows/StandardPublish.yml) [![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
 
 Collection of cross-platform routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.
 
@@ -11,7 +11,7 @@ npm install
 node sample/trivial/Sample.s
 ```
 
-## To add to your project
+### To add to your project
 ```
 npm add 'wprocesswatcher@alpha'
 ```
