@@ -1,6 +1,6 @@
 {
   "name" : "wprocesswatcher",
-  "version" : "0.3.347",
+  "version" : "0.3.348",
   "description" : "Collection of cross-platform routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.",
   "license" : "MIT",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
@@ -24,12 +24,12 @@
   },
   "dependencies" :
   {
-    "wTools" : "delta",
-    "wProto" : "delta",
-    "wCopyable" : "delta",
-    "wprocedure" : "delta",
-    "wprocess" : "delta"
+    "wTools" : "stable",
+    "wProto" : "stable",
+    "wCopyable" : "stable",
+    "wprocedure" : "stable",
+    "wprocess" : "stable"
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "delta", "wprocess" : "delta" },
+  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "stable", "wprocess" : "stable" },
   "keywords" : [ "wTools", "watch", "child process" ]
 }
