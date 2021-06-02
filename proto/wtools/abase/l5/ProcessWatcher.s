@@ -26,7 +26,7 @@ const _ = _global.wTools;
 _.assert( !!_global.wTools, 'Does not have wTools' );
 _.assert( _global.wTools.process === undefined || _global.wTools.process.watcherEnable === undefined, 'wProcessWatcher is already defined' );
 
-const Self = _global.wTools.process = _global.wTools.process || Object.create( null );
+_.process = _.process || Object.create( null );
 
 //
 
@@ -388,7 +388,7 @@ watcherWaitForExit.defaults =
 
 //
 
-let _on = Self.on;
+let _on = _.process.on;
 function on()
 {
   // if( arguments.length === 2 && _.strIs( arguments[ 0 ] ) )
@@ -454,20 +454,9 @@ let NamespaceBlueprint =
   watcherWaitForExit
 }
 
-_.construction.extend( Self, NamespaceBlueprint );
+_.construction.extend( _.process, NamespaceBlueprint );
 
 if( Config.debug )
-_.construction.extend( Self, { on } );
-
-
-// --
-// export
-// --
-
-// if( _realGlobal_ !== _global_ )
-// return ExportTo( _realGlobal_, _global_ );
-
-if( typeof module !== 'undefined' )
-module[ 'exports' ] = _.process;
+_.construction.extend( _.process, { on } );
 
 })();
