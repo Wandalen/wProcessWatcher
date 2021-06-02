@@ -1010,7 +1010,7 @@ function internal( test )
 
   // context.globalNamespaceOpen( _global, 'namespaceOfTest' );
   _.global.new( 'namespaceOfTest', _global );
-  _.global._open( 'namespaceOfTest' );
+  _.global.open( 'namespaceOfTest' );
 
   test.true( _global_ !== _wasGlobal );
 
@@ -1033,7 +1033,7 @@ function internal( test )
   test.identical( _realGlobal_._ProcessWatcherNamespaces, undefined );
   test.identical( _global.wTools.process.__watcherProcessDescriptors, undefined );
 
-  _.global._close( 'namespaceOfTest' );
+  _.global.close( 'namespaceOfTest' );
   // context.globalNamespaceClose();
 
   test.true( _global_ === _wasGlobal );
