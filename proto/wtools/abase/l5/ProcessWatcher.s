@@ -72,7 +72,7 @@ function watcherEnable()
   patch( 'execFileSync' );
   patch( 'execSync' );
 
-  _.props.supplement( processNamespace._ehandler.events, Events );
+  _.props.supplement( processNamespace._edispatcher.events, Events );
   _.arrayAppendOnce( _realGlobal_._ProcessWatcherNamespaces, _global.wTools );
 
   if( processNamespace.__watcherProcessDescriptors === undefined )
@@ -176,9 +176,9 @@ function watcherEnable()
     {
       if( !wTools.process.watcherIsEnabled() )
       return;
-      if( !wTools.process._ehandler.events[ eventName ].length )
+      if( !wTools.process._edispatcher.events[ eventName ].length )
       return;
-      let callbacks = wTools.process._ehandler.events[ eventName ].slice();
+      let callbacks = wTools.process._edispatcher.events[ eventName ].slice();
       callbacks.forEach( ( callback ) =>
       {
         try
@@ -249,7 +249,7 @@ function watcherDisable()
   let processNamespace = this;
   _.each( Events, ( handlers, eventName ) =>
   {
-    if( !processNamespace._ehandler.events[ eventName ] )
+    if( !processNamespace._edispatcher.events[ eventName ] )
     return;
     if( handlers.length )
     {
@@ -274,7 +274,7 @@ function watcherDisable()
       // qqq : bad naming. not "event"
       ///qqq Vova: done
     }
-    delete processNamespace._ehandler.events[ eventName ];
+    delete processNamespace._edispatcher.events[ eventName ];
   })
 
   if( !ChildProcess )
@@ -320,7 +320,7 @@ function watcherIsEnabled()
 {
   let processNamespace = this;
   for( var eventName in Events )
-  if( processNamespace._ehandler.events[ eventName ] )
+  if( processNamespace._edispatcher.events[ eventName ] )
   return true;
   return false;
 }
@@ -401,7 +401,7 @@ function on()
   // _.assert( _.routineIs( arguments[ arguments.length - 1 ] ) );
 
   /* qqq xxx : ? */
-  let o = _.event.on.head( _.event.on, arguments );
+  let o = _.event.onHead( _.event.on, arguments );
   let o2 = _on.call( this, o );
 
   if( arguments.length === 2 )
