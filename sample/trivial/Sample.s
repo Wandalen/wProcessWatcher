@@ -1,5 +1,5 @@
-let _ = require( 'wTools' );
-_.include( 'wProcessWatcher' )
+require( 'wprocesswatcher' );
+let _ = wTools;
 
 /* How to change default homedir for new child process by modifying original arguments */
 
