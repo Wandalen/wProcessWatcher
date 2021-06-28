@@ -73,7 +73,7 @@ function assetFor( test, name )
     _.props.supplement( o.locals, locals );
     _.props.supplement( o.locals.context, locals.context );
     let r = oprogram.body.call( a, o );
-    r.programPath = a.path.nativize( r.programPath );
+    r.filePath/*programPath*/ = a.path.nativize( r.filePath/*programPath*/ );
     return r;
   }
 
@@ -1260,7 +1260,7 @@ function detached( test )
   let context = this;
   let a = context.assetFor( test, null );
 
-  let testAppPath = a.path.nativize( a.program( testApp ).programPath );
+  let testAppPath = a.path.nativize( a.program( testApp ).filePath/*programPath*/ );
 
   let startBegin = 0;
   let startEnd = 0;
@@ -1356,7 +1356,7 @@ function watcherWaitForExit( test )
   let context = this;
   let a = context.assetFor( test, null );
 
-  let testAppPath = a.path.nativize( a.program( testApp ).programPath );
+  let testAppPath = a.path.nativize( a.program( testApp ).filePath/*programPath*/ );
 
   let startBegin = 0;
   let startEnd = 0;
@@ -1455,7 +1455,7 @@ function watcherWaitForExitTimeOut( test )
   let context = this;
   let a = context.assetFor( test, null );
 
-  let testAppPath = a.path.nativize( a.program( testApp ).programPath );
+  let testAppPath = a.path.nativize( a.program( testApp ).filePath/*programPath*/ );
 
   let startBegin = 0;
   let startEnd = 0;
@@ -1563,7 +1563,7 @@ function onAnotherEvents( test )
 {
   let context = this;
   let a = context.assetFor( test, null );
-  let testAppPath = a.path.nativize( a.program( testApp ).programPath );
+  let testAppPath = a.path.nativize( a.program( testApp ).filePath/*programPath*/ );
 
   /* */
 
