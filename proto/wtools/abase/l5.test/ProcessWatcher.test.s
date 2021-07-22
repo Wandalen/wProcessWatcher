@@ -15,7 +15,6 @@ if( typeof module !== 'undefined' )
   require( '../l5/ProcessWatcher.s' );
 
   _.include( 'wTesting' );
-  _.include( 'wFiles' );
   _.include( 'wProcess' );
 
   ChildProcess = require( 'child_process' );
