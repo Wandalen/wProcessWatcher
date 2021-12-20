@@ -1672,7 +1672,7 @@ function onAnotherEvents( test )
   }
 }
 
-onAnotherEvents.timeOut = 10000;
+onAnotherEvents.timeOut = 30000;
 
 //
 
