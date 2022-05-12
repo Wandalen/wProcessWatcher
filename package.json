@@ -1,6 +1,6 @@
 {
   "name": "wprocesswatcher",
-  "version": "0.3.398",
+  "version": "0.3.399",
   "description": "Collection of cross-platform routines for child process monitoring. Allows to keep track of creation, spawn and termination of a child process via events. Get information about command, arguments and options used to create a child process. Modify command, arguments or options on the creation stage. Access instance of ChildProcess on spawn and termination stages.",
   "license": "MIT",
   "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
@@ -35,15 +35,15 @@
     "url": "https://github.com/Wandalen/wProcessWatcher/issues"
   },
   "dependencies": {
-    "wTools": "alpha",
-    "wProto": "alpha",
-    "wprocess": "alpha",
-    "wprocedure": "alpha",
-    "wCopyable": "alpha"
+    "wTools": "latest",
+    "wProto": "latest",
+    "wprocess": "latest",
+    "wprocedure": "latest",
+    "wCopyable": "latest"
   },
   "devDependencies": {
-    "wTesting": "alpha",
-    "wprocess": "alpha",
+    "wTesting": "latest",
+    "wprocess": "latest",
     "eslint": "7.32.0"
   },
   "keywords": [
